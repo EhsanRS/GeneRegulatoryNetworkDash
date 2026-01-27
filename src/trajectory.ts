@@ -2479,6 +2479,131 @@ function updateSliderValues(): void {
   updateSlider('param-hill-k', 'hillK');
 }
 
+// Apply parameters from URL (from inference page)
+function applyURLParams(): void {
+  const urlParams = new URLSearchParams(window.location.search);
+  const encodedParams = urlParams.get('params');
+
+  if (!encodedParams) return;
+
+  try {
+    const json = atob(encodedParams);
+    const data = JSON.parse(json);
+
+    // Apply global parameters
+    if (data.g) {
+      const g = data.g;
+      if (typeof g.hillN === 'number') params.hillN = g.hillN;
+      if (typeof g.hillK === 'number') params.hillK = g.hillK;
+      if (typeof g.progBias === 'number') params.progBias = g.progBias;
+      if (typeof g.linBias === 'number') params.linBias = g.linBias;
+      if (typeof g.progDecay === 'number') params.progDecay = g.progDecay;
+      if (typeof g.linDecay === 'number') params.linDecay = g.linDecay;
+      if (typeof g.inhibitionMult === 'number') params.inhibitionMult = g.inhibitionMult;
+      if (typeof g.morphogenTime === 'number') params.morphogenTime = g.morphogenTime;
+      if (typeof g.morphogenStrength === 'number') params.morphogenStrength = g.morphogenStrength;
+      if (typeof g.initProgTF === 'number') params.initProgTF = g.initProgTF;
+      if (typeof g.initLinTF === 'number') params.initLinTF = g.initLinTF;
+      if (typeof g.ligandBias === 'number') params.ligandBias = g.ligandBias;
+      if (typeof g.receptorBias === 'number') params.receptorBias = g.receptorBias;
+    }
+
+    // Apply knockouts
+    if (data.k && Array.isArray(data.k)) {
+      knockouts.clear();
+      data.k.forEach((idx: number) => knockouts.add(idx));
+    }
+
+    // Apply morphogen settings
+    if (data.m && Array.isArray(data.m)) {
+      data.m.forEach((m: { enabled: boolean; strength: number }, i: number) => {
+        if (i < morphogenEnabled.length) {
+          morphogenEnabled[i] = m.enabled;
+          morphogenStrengths[i] = m.strength;
+        }
+      });
+    }
+
+    // Update UI sliders to reflect imported params
+    updateAdvancedSlidersFromParams();
+
+    // Update knockout UI
+    updateKnockoutUI();
+
+    // Update morphogen UI
+    updateMorphogenUI();
+
+    console.log('Applied parameters from inference page');
+  } catch (e) {
+    console.warn('Failed to parse URL params:', e);
+  }
+}
+
+// Update knockout checkboxes from state
+function updateKnockoutUI(): void {
+  document.querySelectorAll('.knockout-checkbox').forEach(cb => {
+    const geneIdx = parseInt((cb as HTMLInputElement).dataset.gene ?? '-1', 10);
+    if (geneIdx >= 0) {
+      (cb as HTMLInputElement).checked = knockouts.has(geneIdx);
+    }
+  });
+  updateKnockoutCount();
+}
+
+// Update morphogen controls from state
+function updateMorphogenUI(): void {
+  // Update enable checkboxes
+  document.querySelectorAll('#morphogen-list .knockout-checkbox').forEach(cb => {
+    const idx = parseInt((cb as HTMLInputElement).dataset.morphogen ?? '-1', 10);
+    if (idx >= 0 && idx < morphogenEnabled.length) {
+      (cb as HTMLInputElement).checked = morphogenEnabled[idx];
+    }
+  });
+
+  // Update strength sliders
+  for (let i = 0; i < morphogenStrengths.length; i++) {
+    const slider = document.getElementById(`morph-str-${i}`) as HTMLInputElement;
+    const valSpan = document.getElementById(`morph-val-${i}`);
+    if (slider) {
+      slider.value = morphogenStrengths[i].toString();
+    }
+    if (valSpan) {
+      valSpan.textContent = morphogenStrengths[i].toFixed(1);
+    }
+  }
+}
+
+// Update advanced sliders from current params
+function updateAdvancedSlidersFromParams(): void {
+  const sliderMap: { id: string; param: keyof typeof params; format?: (v: number) => string }[] = [
+    { id: 'param-init-prog', param: 'initProgTF' },
+    { id: 'param-init-lin', param: 'initLinTF' },
+    { id: 'param-init-ligand', param: 'initLigand' },
+    { id: 'param-prog-bias', param: 'progBias' },
+    { id: 'param-lin-bias', param: 'linBias' },
+    { id: 'param-prog-decay', param: 'progDecay' },
+    { id: 'param-lin-decay', param: 'linDecay' },
+    { id: 'param-inhibition', param: 'inhibitionMult' },
+    { id: 'param-morph-time', param: 'morphogenTime', format: v => `${v}h` },
+    { id: 'param-morph-strength', param: 'morphogenStrength' },
+    { id: 'param-hill-n', param: 'hillN', format: v => String(Math.round(v)) },
+    { id: 'param-hill-k', param: 'hillK' },
+  ];
+
+  for (const { id, param, format } of sliderMap) {
+    const slider = document.getElementById(id) as HTMLInputElement;
+    const valSpan = document.getElementById(id.replace('param-', 'val-'));
+
+    if (slider) {
+      slider.value = params[param].toString();
+    }
+    if (valSpan) {
+      const val = params[param];
+      valSpan.textContent = format ? format(val) : val.toFixed(2);
+    }
+  }
+}
+
 function init(): void {
   cellCanvas = document.getElementById('cell-canvas') as HTMLCanvasElement;
   cellCtx = cellCanvas.getContext('2d')!;
@@ -2606,6 +2731,9 @@ function init(): void {
 
   // Initial canvas sizing
   resizeCanvases();
+
+  // Check for imported parameters from inference page
+  applyURLParams();
 
   resetSimulation();
   updateCellDetails(); // Initialize cell details panel

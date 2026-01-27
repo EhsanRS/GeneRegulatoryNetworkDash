@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
-import { resolve } from 'path'
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 export default defineConfig({
   build: {
@@ -7,7 +7,8 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         trajectory: resolve(__dirname, 'trajectory.html'),
+        inference: resolve(__dirname, 'inference.html'),
       },
     },
   },
-})
+});

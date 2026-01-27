@@ -79,6 +79,20 @@ body {
   background: var(--bg-tertiary);
 }
 
+.header-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.header-link:hover {
+  color: var(--accent-purple);
+  background: var(--bg-tertiary);
+}
+
 .header h1 {
   font-size: 1.25rem;
   font-weight: 600;

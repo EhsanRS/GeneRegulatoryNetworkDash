@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRN Parameter Inference</title>
+  <link rel="stylesheet" href="/src/inference.css">
+</head>
+<body>
+  <div class="dashboard">
+    <header class="header">
+      <div class="header-left">
+        <a href="/trajectory.html" class="back-link">← Trajectory Simulation</a>
+      </div>
+      <div class="header-center">
+        <h1>Parameter Inference</h1>
+        <p class="subtitle">Find simulation parameters that produce a target cell state</p>
+      </div>
+      <div class="header-right">
+        <button id="btn-import" class="header-btn">Import State</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <!-- Left Panel: Target Setup -->
+      <aside class="sidebar">
+        <section class="panel">
+          <h2>Target State Setup</h2>
+          <p class="section-hint">Define the desired gene expression levels</p>
+
+          <div class="target-section">
+            <div class="section-title accordion-header" data-target="prog-targets">
+              <span class="accordion-icon">▼</span> Progenitor TFs
+            </div>
+            <div id="prog-targets" class="target-list accordion-content"></div>
+          </div>
+
+          <div class="target-section">
+            <div class="section-title accordion-header" data-target="lin-targets">
+              <span class="accordion-icon">▼</span> Lineage TFs
+            </div>
+            <div id="lin-targets" class="target-list accordion-content"></div>
+          </div>
+
+          <div class="target-section">
+            <div class="section-title accordion-header" data-target="ligand-targets">
+              <span class="accordion-icon">▶</span> Ligands
+            </div>
+            <div id="ligand-targets" class="target-list accordion-content collapsed"></div>
+          </div>
+
+          <div class="target-section">
+            <div class="section-title accordion-header" data-target="receptor-targets">
+              <span class="accordion-icon">▶</span> Receptors
+            </div>
+            <div id="receptor-targets" class="target-list accordion-content collapsed"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Gene Weights</h2>
+          <p class="section-hint">Select which genes must match the target</p>
+
+          <div class="weight-presets">
+            <button class="preset-btn" data-preset="uniform">All Genes</button>
+            <button class="preset-btn" data-preset="tfs-only">TFs Only</button>
+            <button class="preset-btn active" data-preset="select">Select Genes</button>
+          </div>
+
+          <div id="weight-select" class="weight-select">
+            <p class="select-hint">Only selected genes contribute to fitness. Unselected genes can be anything.</p>
+
+            <div class="gene-select-section">
+              <div class="gene-select-header">
+                <span>Progenitor TFs</span>
+                <button class="select-all-btn" data-group="prog">All</button>
+                <button class="select-none-btn" data-group="prog">None</button>
+              </div>
+              <div id="select-prog" class="gene-select-grid"></div>
+            </div>
+
+            <div class="gene-select-section">
+              <div class="gene-select-header">
+                <span>Lineage TFs</span>
+                <button class="select-all-btn" data-group="lin">All</button>
+                <button class="select-none-btn" data-group="lin">None</button>
+              </div>
+              <div id="select-lin" class="gene-select-grid"></div>
+            </div>
+
+            <div class="gene-select-section">
+              <div class="gene-select-header">
+                <span>Ligands</span>
+                <button class="select-all-btn" data-group="ligand">All</button>
+                <button class="select-none-btn" data-group="ligand">None</button>
+              </div>
+              <div id="select-ligand" class="gene-select-grid"></div>
+            </div>
+
+            <div class="gene-select-section">
+              <div class="gene-select-header">
+                <span>Receptors</span>
+                <button class="select-all-btn" data-group="receptor">All</button>
+                <button class="select-none-btn" data-group="receptor">None</button>
+              </div>
+              <div id="select-receptor" class="gene-select-grid"></div>
+            </div>
+
+            <div class="selected-count">
+              Selected: <span id="selected-gene-count">0</span> genes
+            </div>
+          </div>
+
+          <div id="weight-custom" class="weight-custom hidden">
+            <div class="weight-group">
+              <label>Progenitor TFs</label>
+              <input type="range" id="weight-prog" min="0" max="3" step="0.1" value="1">
+              <span class="weight-val" id="val-weight-prog">1.0</span>
+            </div>
+            <div class="weight-group">
+              <label>Lineage TFs</label>
+              <input type="range" id="weight-lin" min="0" max="3" step="0.1" value="1">
+              <span class="weight-val" id="val-weight-lin">1.0</span>
+            </div>
+            <div class="weight-group">
+              <label>Ligands</label>
+              <input type="range" id="weight-ligand" min="0" max="3" step="0.1" value="0.5">
+              <span class="weight-val" id="val-weight-ligand">0.5</span>
+            </div>
+            <div class="weight-group">
+              <label>Receptors</label>
+              <input type="range" id="weight-receptor" min="0" max="3" step="0.1" value="0.5">
+              <span class="weight-val" id="val-weight-receptor">0.5</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Optimization Config</h2>
+
+          <div class="config-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-global" checked>
+              <span>Global parameters</span>
+            </label>
+          </div>
+
+          <div class="config-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-knockouts" checked>
+              <span>Gene knockouts</span>
+            </label>
+          </div>
+
+          <div class="config-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-morphogens" checked>
+              <span>Morphogen per-lineage</span>
+            </label>
+          </div>
+
+          <div class="config-group">
+            <label>Max Generations: <span id="max-gen-val">200</span></label>
+            <input type="range" id="max-generations" min="50" max="500" step="10" value="200">
+          </div>
+
+          <div class="config-group">
+            <label>Population Size: <span id="pop-size-val">20</span></label>
+            <input type="range" id="pop-size" min="10" max="50" step="5" value="20">
+          </div>
+
+          <div class="config-group">
+            <label>Simulation Time: <span id="sim-time-val">12</span>h</label>
+            <input type="range" id="sim-time" min="6" max="24" step="2" value="12">
+          </div>
+
+          <div class="button-group">
+            <button id="btn-start" class="primary">Start Optimization</button>
+            <button id="btn-stop" disabled>Stop</button>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Center: Visualization -->
+      <main class="visualization-area">
+        <div class="viz-row">
+          <div class="viz-panel progress-panel">
+            <div class="viz-header">
+              <h3>Optimization Progress</h3>
+              <span id="status-label" class="status-label">Ready</span>
+            </div>
+            <div class="viz-content">
+              <div class="progress-stats">
+                <div class="stat">
+                  <span class="stat-label">Generation</span>
+                  <span class="stat-value" id="gen-display">0 / 200</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Best Fitness</span>
+                  <span class="stat-value" id="fitness-display">-</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Correlation</span>
+                  <span class="stat-value" id="corr-display">-</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Step Size (σ)</span>
+                  <span class="stat-value" id="sigma-display">-</span>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="fitness-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="viz-row">
+          <div class="viz-panel comparison-panel">
+            <div class="viz-header">
+              <h3>Expression Comparison</h3>
+              <div class="legend-inline">
+                <span class="legend-item target">● Target</span>
+                <span class="legend-item simulated">○ Best Found</span>
+              </div>
+            </div>
+            <div class="viz-content">
+              <canvas id="comparison-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="viz-row">
+          <div class="viz-panel scatter-panel">
+            <div class="viz-header">
+              <h3>Target vs Simulated</h3>
+            </div>
+            <div class="viz-content">
+              <canvas id="scatter-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Panel: Results -->
+      <aside class="details-panel">
+        <section class="panel">
+          <h2>Found Parameters</h2>
+          <div id="result-params" class="result-params">
+            <p class="placeholder">Run optimization to see results</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Knockouts</h2>
+          <div id="result-knockouts" class="result-knockouts">
+            <p class="placeholder">-</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Morphogen Strengths</h2>
+          <div id="result-morphogens" class="result-morphogens">
+            <p class="placeholder">-</p>
+          </div>
+        </section>
+
+        <section class="panel actions-panel">
+          <h2>Actions</h2>
+          <div class="action-buttons">
+            <button id="btn-apply" class="primary" disabled>Apply to Trajectory</button>
+            <button id="btn-export" disabled>Export Parameters</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div id="import-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Import Cell State</h3>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Paste expression values (JSON format):</p>
+        <textarea id="import-textarea" rows="10" placeholder='{"expression": [1.5, 0.2, ...], "weights": [1, 1, ...]}'></textarea>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-import-confirm" class="primary">Import</button>
+        <button id="btn-import-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/inference.ts"></script>
+</body>
+</html>
