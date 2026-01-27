@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gene Regulatory Network Dashboard</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <div class="dashboard">
+    <header class="header">
+      <div class="header-nav">
+        <a href="/" class="nav-link active">Network</a>
+        <a href="/trajectory.html" class="nav-link">Trajectory Simulation</a>
+      </div>
+      <div class="header-title">
+        <h1>Synthetic GRN Visualization</h1>
+        <p class="subtitle">Interactive Gene Regulatory Network Explorer</p>
+      </div>
+      <div class="header-spacer"></div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <section class="panel">
+          <h2>Network Statistics</h2>
+          <div class="stats-grid" id="stats">
+            <div class="stat-item">
+              <span class="stat-value" id="stat-genes">-</span>
+              <span class="stat-label">Genes</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-edges">-</span>
+              <span class="stat-label">Edges</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-activating">-</span>
+              <span class="stat-label">Activating</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-inhibiting">-</span>
+              <span class="stat-label">Inhibiting</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Gene Types</h2>
+          <div class="filter-group" id="gene-filters">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Edge Types</h2>
+          <div class="filter-group" id="edge-filters">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Display Options</h2>
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="show-labels" checked>
+              Show Labels
+            </label>
+          </div>
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="show-weights">
+              Show Edge Weights
+            </label>
+          </div>
+          <div class="control-group">
+            <label for="min-weight">Min Weight: <span id="min-weight-val">0.0</span></label>
+            <input type="range" id="min-weight" min="0" max="1" step="0.05" value="0">
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Layout</h2>
+          <div class="button-group">
+            <button id="layout-cola">Cola</button>
+            <button id="layout-dagre">Dagre</button>
+            <button id="layout-concentric">Concentric</button>
+          </div>
+          <div class="control-group">
+            <button id="reset-zoom" class="secondary">Reset Zoom</button>
+          </div>
+        </section>
+      </aside>
+
+      <main class="visualization">
+        <div class="viz-container" id="network-container"></div>
+        <div class="tooltip" id="tooltip"></div>
+      </main>
+
+      <aside class="details-panel">
+        <section class="panel">
+          <h2>Selected Node</h2>
+          <div id="node-details">
+            <p class="placeholder">Click a node to see details</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Legend</h2>
+          <div class="legend" id="legend">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

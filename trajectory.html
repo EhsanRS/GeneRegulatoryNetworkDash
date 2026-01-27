@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRN Trajectory Simulation</title>
+  <link rel="stylesheet" href="/src/trajectory.css">
+</head>
+<body>
+  <div class="dashboard">
+    <header class="header">
+      <div class="header-left">
+        <a href="/" class="back-link">← Network View</a>
+      </div>
+      <div class="header-center">
+        <h1>GRN Trajectory Simulation</h1>
+        <p class="subtitle">Cell differentiation dynamics driven by gene regulatory network</p>
+      </div>
+      <div class="header-right"></div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <section class="panel">
+          <h2>Simulation Controls</h2>
+          <div class="control-group">
+            <label for="n-cells">Cells: <span id="n-cells-val">100</span></label>
+            <input type="range" id="n-cells" min="20" max="500" step="20" value="100">
+          </div>
+          <div class="control-group">
+            <label for="speed">Speed: <span id="speed-val">0.1x</span></label>
+            <input type="range" id="speed" min="0.05" max="2" step="0.05" value="0.1">
+          </div>
+          <div class="control-group">
+            <label for="noise">Noise: <span id="noise-val">0.10</span></label>
+            <input type="range" id="noise" min="0" max="0.5" step="0.02" value="0.1">
+          </div>
+          <div class="button-group">
+            <button id="btn-play" class="primary">▶ Play</button>
+            <button id="btn-reset">Reset</button>
+          </div>
+          <div class="control-group reference-toggle">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-reference" checked>
+              <span>Show Reference (ghost cells)</span>
+            </label>
+            <p class="reference-hint">Faded cells show default behavior for comparison</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Time</h2>
+          <div class="time-display">
+            <span class="time-value" id="time-display">0.0</span>
+            <span class="time-unit">hours</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Population</h2>
+          <div class="time-display">
+            <span class="time-value" id="cell-count">100</span>
+            <span class="time-unit">cells</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Color By</h2>
+          <div class="radio-group">
+            <label><input type="radio" name="color-by" value="lineage" checked> Lineage</label>
+            <label><input type="radio" name="color-by" value="time"> Time</label>
+            <label><input type="radio" name="color-by" value="gene"> Gene Expression</label>
+          </div>
+          <div id="gene-select-container" class="control-group hidden">
+            <select id="gene-select">
+              <option value="">Select gene...</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Lineage Distribution</h2>
+          <div id="lineage-bars" class="lineage-bars"></div>
+        </section>
+      </aside>
+
+      <main class="visualization-area">
+        <div class="viz-row" id="row-cell-state">
+          <div class="viz-panel cell-landscape">
+            <div class="viz-header">
+              <button class="panel-toggle" data-target="row-cell-state" title="Minimize">−</button>
+              <h3>Cell State Space</h3>
+              <button id="btn-reset-cell-zoom" class="zoom-reset-btn" title="Reset zoom">⟲ Reset Zoom</button>
+            </div>
+            <div class="viz-content">
+              <canvas id="cell-canvas"></canvas>
+              <div class="axis-label x-axis">PC1 (Lineage Axis)</div>
+              <div class="axis-label y-axis">PC2 (Differentiation)</div>
+              <div class="zoom-hint">Scroll to zoom, drag to pan</div>
+            </div>
+          </div>
+        </div>
+        <div class="viz-row" id="row-gene-expr">
+          <div class="viz-panel expression-panel">
+            <div class="viz-header">
+              <button class="panel-toggle" data-target="row-gene-expr" title="Minimize">−</button>
+              <h3>Gene Expression Dynamics</h3>
+              <button id="btn-reset-expr-zoom" class="zoom-reset-btn" title="Reset zoom">⟲ Reset Zoom</button>
+            </div>
+            <div class="viz-content">
+              <div class="gene-selector">
+                <button class="gene-btn active" data-genes="tf_prog">Prog TFs</button>
+                <button class="gene-btn" data-genes="tf_lin">Lin TFs</button>
+                <button class="gene-btn" data-genes="ligands">Ligands</button>
+                <button class="gene-btn" data-genes="receptors">Receptors</button>
+                <button class="gene-btn" data-genes="targets">Targets</button>
+                <button class="gene-btn" data-genes="housekeeping">HK</button>
+                <button class="gene-btn" data-genes="other">Other</button>
+              </div>
+              <canvas id="expression-canvas"></canvas>
+              <div class="zoom-hint">Scroll to zoom, drag to pan</div>
+            </div>
+          </div>
+        </div>
+        <div class="viz-row selected-cell-row" id="row-selected-cell">
+          <div class="viz-panel selected-cell-panel">
+            <div class="viz-header">
+              <button class="panel-toggle" data-target="row-selected-cell" title="Minimize">−</button>
+              <h3>Selected Cell Expression</h3>
+              <span id="selected-cell-label" class="selected-cell-label">No cell selected</span>
+            </div>
+            <div class="viz-content selected-cell-content">
+              <div class="selected-cell-chart">
+                <canvas id="selected-cell-canvas"></canvas>
+              </div>
+              <div class="selected-cell-genes">
+                <div class="gene-selector-header">Track Genes</div>
+                <div id="gene-selector-panel" class="gene-selector-panel">
+                  <p class="placeholder">Select a cell to choose genes</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="details-panel">
+        <!-- Apply Changes Button - Always Visible -->
+        <section class="panel apply-panel">
+          <button id="btn-apply-main" class="apply-btn-main">Apply Changes & Reset</button>
+          <p class="apply-hint">Applies all parameter changes and restarts simulation</p>
+        </section>
+
+        <!-- Simulation Time -->
+        <section class="panel">
+          <h2>Simulation Time</h2>
+          <div class="control-group">
+            <label for="max-time">Duration: <span id="max-time-val">24</span>h</label>
+            <input type="range" id="max-time" min="12" max="96" step="6" value="24">
+          </div>
+        </section>
+
+        <!-- Cell Steering Controls -->
+        <section class="panel accordion">
+          <h2 class="accordion-header" data-target="steering-content">
+            <span class="accordion-icon">▼</span> Cell Steering
+          </h2>
+          <div id="steering-content" class="accordion-content">
+            <p class="section-hint">Direct GRN manipulation - force cells into unusual states</p>
+
+            <div class="steering-section">
+              <div class="steering-title">Lineage Forcing (direct TF activation)</div>
+              <p class="section-hint">Add external signal to lineage TFs: -1=inhibit, 0=none, +1=activate</p>
+              <div class="param-row">
+                <label>Lin 1</label>
+                <input type="range" id="lin-signal-0" min="-1" max="1" step="0.1" value="0">
+                <span class="param-value" id="val-lin-signal-0">0.0</span>
+              </div>
+              <div class="param-row">
+                <label>Lin 2</label>
+                <input type="range" id="lin-signal-1" min="-1" max="1" step="0.1" value="0">
+                <span class="param-value" id="val-lin-signal-1">0.0</span>
+              </div>
+              <div class="param-row">
+                <label>Lin 3</label>
+                <input type="range" id="lin-signal-2" min="-1" max="1" step="0.1" value="0">
+                <span class="param-value" id="val-lin-signal-2">0.0</span>
+              </div>
+              <div class="param-row">
+                <label>Lin 4</label>
+                <input type="range" id="lin-signal-3" min="-1" max="1" step="0.1" value="0">
+                <span class="param-value" id="val-lin-signal-3">0.0</span>
+              </div>
+              <div class="param-row">
+                <label>Lin 5</label>
+                <input type="range" id="lin-signal-4" min="-1" max="1" step="0.1" value="0">
+                <span class="param-value" id="val-lin-signal-4">0.0</span>
+              </div>
+              <div class="param-row">
+                <label>Lin 6</label>
+                <input type="range" id="lin-signal-5" min="-1" max="1" step="0.1" value="0">
+                <span class="param-value" id="val-lin-signal-5">0.0</span>
+              </div>
+              <button id="btn-reset-lin-signals" class="clear-btn">Reset All to 0</button>
+            </div>
+
+            <div class="steering-section">
+              <div class="steering-title">Position Bias (visual)</div>
+              <div class="param-row">
+                <label>X (L↔R)</label>
+                <input type="range" id="bias-x" min="-1" max="1" step="0.1" value="0">
+                <span class="param-value" id="val-bias-x">0.0</span>
+              </div>
+              <div class="param-row">
+                <label>Y (D↔U)</label>
+                <input type="range" id="bias-y" min="-1" max="1" step="0.1" value="0">
+                <span class="param-value" id="val-bias-y">0.0</span>
+              </div>
+            </div>
+
+            <div class="steering-section">
+              <div class="steering-title">Click Attractors (visual)</div>
+              <div class="attractor-controls">
+                <button id="btn-attractor-mode" class="attractor-mode-btn">🎯 Place Attractors</button>
+                <button id="btn-clear-attractors" class="clear-btn">Clear All</button>
+              </div>
+              <div class="param-row">
+                <label>Strength</label>
+                <input type="range" id="attractor-strength" min="0" max="1" step="0.05" value="0.3">
+                <span class="param-value" id="val-attractor-strength">0.30</span>
+              </div>
+              <p class="section-hint">Click on plot to place visual attractors</p>
+              <div id="attractor-count" class="attractor-count"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Knockouts Accordion -->
+        <section class="panel accordion">
+          <h2 class="accordion-header" data-target="knockout-content">
+            <span class="accordion-icon">▼</span> Knockouts <span id="knockout-count" class="knockout-count"></span>
+          </h2>
+          <div id="knockout-content" class="accordion-content">
+            <div class="knockout-section">
+              <div class="knockout-section-title">Progenitor TFs</div>
+              <div id="knockout-prog-list" class="knockout-list"></div>
+            </div>
+            <div class="knockout-section">
+              <div class="knockout-section-title">Lineage TFs</div>
+              <div id="knockout-lin-list" class="knockout-list"></div>
+            </div>
+            <div class="knockout-section">
+              <div class="knockout-section-title">Ligands</div>
+              <div id="knockout-ligand-list" class="knockout-list"></div>
+            </div>
+            <div class="knockout-section">
+              <div class="knockout-section-title">Receptors</div>
+              <div id="knockout-receptor-list" class="knockout-list"></div>
+            </div>
+            <div class="knockout-controls">
+              <button id="btn-clear-knockouts" class="clear-btn">Clear All Knockouts</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Gene Modifiers Accordion (Inhibitors/Activators) -->
+        <section class="panel accordion">
+          <h2 class="accordion-header" data-target="modifiers-content">
+            <span class="accordion-icon">▼</span> Gene Modifiers
+          </h2>
+          <div id="modifiers-content" class="accordion-content collapsed">
+            <p class="section-hint">Adjust activity: 0=inhibited, 1=normal, 2=activated</p>
+            <div class="modifier-section">
+              <div class="modifier-section-title">Progenitor TFs</div>
+              <div id="modifier-prog-list" class="modifier-list"></div>
+            </div>
+            <div class="modifier-section">
+              <div class="modifier-section-title">Lineage TFs</div>
+              <div id="modifier-lin-list" class="modifier-list"></div>
+            </div>
+            <div class="modifier-section">
+              <div class="modifier-section-title">Ligands</div>
+              <div id="modifier-ligand-list" class="modifier-list"></div>
+            </div>
+            <div class="modifier-section">
+              <div class="modifier-section-title">Receptors</div>
+              <div id="modifier-receptor-list" class="modifier-list"></div>
+            </div>
+            <button id="btn-reset-modifiers" class="clear-btn">Reset All to 1.0</button>
+          </div>
+        </section>
+
+        <!-- Morphogens Accordion -->
+        <section class="panel accordion">
+          <h2 class="accordion-header" data-target="morphogen-content">
+            <span class="accordion-icon">▼</span> Morphogens
+          </h2>
+          <div id="morphogen-content" class="accordion-content collapsed">
+            <div class="knockout-section-title morphogen-title">Enable/Disable</div>
+            <div id="morphogen-list" class="knockout-list"></div>
+            <div class="knockout-section-title morphogen-title" style="margin-top: 0.5rem;">Strength</div>
+            <div class="morphogen-sliders" id="morphogen-sliders">
+              <div class="morphogen-slider-row"><label>M1</label><input type="range" id="morph-str-0" min="0" max="3" step="0.1" value="1"><span id="morph-val-0">1.0</span></div>
+              <div class="morphogen-slider-row"><label>M2</label><input type="range" id="morph-str-1" min="0" max="3" step="0.1" value="1"><span id="morph-val-1">1.0</span></div>
+              <div class="morphogen-slider-row"><label>M3</label><input type="range" id="morph-str-2" min="0" max="3" step="0.1" value="1"><span id="morph-val-2">1.0</span></div>
+              <div class="morphogen-slider-row"><label>M4</label><input type="range" id="morph-str-3" min="0" max="3" step="0.1" value="1"><span id="morph-val-3">1.0</span></div>
+              <div class="morphogen-slider-row"><label>M5</label><input type="range" id="morph-str-4" min="0" max="3" step="0.1" value="1"><span id="morph-val-4">1.0</span></div>
+              <div class="morphogen-slider-row"><label>M6</label><input type="range" id="morph-str-5" min="0" max="3" step="0.1" value="1"><span id="morph-val-5">1.0</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Network Edges Accordion -->
+        <section class="panel accordion">
+          <h2 class="accordion-header" data-target="network-content">
+            <span class="accordion-icon">▼</span> Network Edges
+          </h2>
+          <div id="network-content" class="accordion-content collapsed">
+            <div id="edge-type-list" class="knockout-list"></div>
+            <p class="section-hint">Purple=enabled, Red=disabled</p>
+          </div>
+        </section>
+
+        <!-- Advanced Parameters Accordion -->
+        <section class="panel accordion">
+          <h2 class="accordion-header" data-target="advanced-content">
+            <span class="accordion-icon">▼</span> Advanced Parameters
+          </h2>
+          <div id="advanced-content" class="accordion-content collapsed">
+            <div class="param-section">
+              <div class="param-section-title">Initial Expression</div>
+              <div class="param-row">
+                <label>Prog TFs</label>
+                <input type="range" id="param-init-prog" min="0.5" max="3" step="0.1">
+                <span class="param-value" id="val-init-prog">1.50</span>
+              </div>
+              <div class="param-row">
+                <label>Lin TFs</label>
+                <input type="range" id="param-init-lin" min="0" max="1" step="0.05">
+                <span class="param-value" id="val-init-lin">0.00</span>
+              </div>
+              <div class="param-row">
+                <label>Ligands</label>
+                <input type="range" id="param-init-ligand" min="0" max="1" step="0.05">
+                <span class="param-value" id="val-init-ligand">0.20</span>
+              </div>
+            </div>
+
+            <div class="param-section">
+              <div class="param-section-title">Regulatory</div>
+              <div class="param-row">
+                <label>Prog Bias</label>
+                <input type="range" id="param-prog-bias" min="0.01" max="0.3" step="0.01">
+                <span class="param-value" id="val-prog-bias">0.08</span>
+              </div>
+              <div class="param-row">
+                <label>Lin Bias</label>
+                <input type="range" id="param-lin-bias" min="0" max="0.1" step="0.005">
+                <span class="param-value" id="val-lin-bias">0.00</span>
+              </div>
+              <div class="param-row">
+                <label>Prog Decay</label>
+                <input type="range" id="param-prog-decay" min="0.05" max="0.5" step="0.05">
+                <span class="param-value" id="val-prog-decay">0.25</span>
+              </div>
+              <div class="param-row">
+                <label>Lin Decay</label>
+                <input type="range" id="param-lin-decay" min="0.05" max="0.4" step="0.05">
+                <span class="param-value" id="val-lin-decay">0.15</span>
+              </div>
+              <div class="param-row">
+                <label>Inhibition</label>
+                <input type="range" id="param-inhibition" min="1" max="5" step="0.25">
+                <span class="param-value" id="val-inhibition">2.50</span>
+              </div>
+            </div>
+
+            <div class="param-section">
+              <div class="param-section-title">Morphogen</div>
+              <div class="param-row">
+                <label>Activation</label>
+                <input type="range" id="param-morph-time" min="1" max="12" step="0.5">
+                <span class="param-value" id="val-morph-time">4h</span>
+              </div>
+              <div class="param-row">
+                <label>Strength</label>
+                <input type="range" id="param-morph-strength" min="0.2" max="1.5" step="0.1">
+                <span class="param-value" id="val-morph-strength">0.80</span>
+              </div>
+            </div>
+
+            <div class="param-section">
+              <div class="param-section-title">Hill Function</div>
+              <div class="param-row">
+                <label>Coefficient n</label>
+                <input type="range" id="param-hill-n" min="1" max="8" step="1">
+                <span class="param-value" id="val-hill-n">4</span>
+              </div>
+              <div class="param-row">
+                <label>Threshold k</label>
+                <input type="range" id="param-hill-k" min="0.2" max="2" step="0.1">
+                <span class="param-value" id="val-hill-k">1.00</span>
+              </div>
+            </div>
+
+            <div class="param-controls">
+              <select id="param-presets" class="preset-select">
+                <option value="default">Default</option>
+                <option value="highPlasticity">High Plasticity</option>
+                <option value="strongCommitment">Strong Commitment</option>
+                <option value="delayedDifferentiation">Delayed Differentiation</option>
+              </select>
+              <button id="btn-apply-params" class="apply-btn">Apply & Reset</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Selected Cell</h2>
+          <div id="cell-details">
+            <p class="placeholder">Hover over a cell to see details</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Legend</h2>
+          <div id="legend" class="legend"></div>
+        </section>
+
+        <section class="panel">
+          <h2>GRN Dynamics</h2>
+          <div class="info-text">
+            <p><strong>Progenitor State:</strong> TF_PROG genes maintain pluripotency through mutual activation.</p>
+            <p><strong>Lineage Commitment:</strong> Lineage TFs inhibit each other, creating bistable switches.</p>
+            <p><strong>Differentiation:</strong> Committed cells activate lineage-specific targets and ligands.</p>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module" src="/src/trajectory.ts"></script>
+</body>
+</html>

@@ -1,0 +1,4724 @@
+{
+  "gene_names": [
+    "TF_PROG_1",
+    "TF_PROG_2",
+    "TF_PROG_3",
+    "TF_PROG_4",
+    "TF_LIN1",
+    "TF_LIN2",
+    "TF_LIN3",
+    "TF_LIN4",
+    "TF_LIN5",
+    "TF_LIN6",
+    "TF_LIN7",
+    "TF_LIN8",
+    "TF_LIN9",
+    "TF_LIN10",
+    "TF_LIN11",
+    "TF_LIN12",
+    "LIG_1",
+    "LIG_2",
+    "LIG_3",
+    "LIG_4",
+    "LIG_5",
+    "LIG_6",
+    "LIG_7",
+    "LIG_8",
+    "LIG_9",
+    "LIG_10",
+    "LIG_11",
+    "LIG_12",
+    "LIG_13",
+    "LIG_14",
+    "LIG_15",
+    "LIG_16",
+    "LIG_17",
+    "LIG_18",
+    "LIG_19",
+    "LIG_20",
+    "REC_1",
+    "REC_2",
+    "REC_3",
+    "REC_4",
+    "REC_5",
+    "REC_6",
+    "REC_7",
+    "REC_8",
+    "REC_9",
+    "REC_10",
+    "REC_11",
+    "REC_12",
+    "REC_13",
+    "REC_14",
+    "REC_15",
+    "REC_16",
+    "REC_17",
+    "REC_18",
+    "REC_19",
+    "REC_20",
+    "TARG_1",
+    "TARG_2",
+    "TARG_3",
+    "TARG_4",
+    "TARG_5",
+    "TARG_6",
+    "TARG_7",
+    "TARG_8",
+    "TARG_9",
+    "TARG_10",
+    "TARG_11",
+    "TARG_12",
+    "TARG_13",
+    "TARG_14",
+    "TARG_15",
+    "TARG_16",
+    "TARG_17",
+    "TARG_18",
+    "TARG_19",
+    "TARG_20",
+    "TARG_21",
+    "TARG_22",
+    "TARG_23",
+    "TARG_24",
+    "TARG_25",
+    "TARG_26",
+    "TARG_27",
+    "TARG_28",
+    "TARG_29",
+    "TARG_30",
+    "TARG_31",
+    "TARG_32",
+    "TARG_33",
+    "TARG_34",
+    "TARG_35",
+    "TARG_36",
+    "TARG_37",
+    "TARG_38",
+    "TARG_39",
+    "TARG_40",
+    "TARG_41",
+    "TARG_42",
+    "TARG_43",
+    "TARG_44",
+    "TARG_45",
+    "TARG_46",
+    "TARG_47",
+    "TARG_48",
+    "TARG_49",
+    "TARG_50",
+    "TARG_51",
+    "TARG_52",
+    "TARG_53",
+    "TARG_54",
+    "TARG_55",
+    "TARG_56",
+    "TARG_57",
+    "TARG_58",
+    "TARG_59",
+    "TARG_60",
+    "TARG_61",
+    "TARG_62",
+    "TARG_63",
+    "TARG_64",
+    "TARG_65",
+    "TARG_66",
+    "TARG_67",
+    "TARG_68",
+    "TARG_69",
+    "TARG_70",
+    "TARG_71",
+    "TARG_72",
+    "TARG_73",
+    "TARG_74",
+    "TARG_75",
+    "TARG_76",
+    "TARG_77",
+    "TARG_78",
+    "TARG_79",
+    "TARG_80",
+    "HK_1",
+    "HK_2",
+    "HK_3",
+    "HK_4",
+    "HK_5",
+    "HK_6",
+    "HK_7",
+    "HK_8",
+    "HK_9",
+    "HK_10",
+    "HK_11",
+    "HK_12",
+    "HK_13",
+    "HK_14",
+    "HK_15",
+    "HK_16",
+    "HK_17",
+    "HK_18",
+    "HK_19",
+    "HK_20",
+    "HK_21",
+    "HK_22",
+    "HK_23",
+    "HK_24",
+    "HK_25",
+    "HK_26",
+    "HK_27",
+    "HK_28",
+    "HK_29",
+    "HK_30",
+    "HK_31",
+    "HK_32",
+    "HK_33",
+    "HK_34",
+    "HK_35",
+    "HK_36",
+    "HK_37",
+    "HK_38",
+    "HK_39",
+    "HK_40",
+    "HK_41",
+    "HK_42",
+    "HK_43",
+    "HK_44",
+    "HK_45",
+    "HK_46",
+    "HK_47",
+    "HK_48",
+    "HK_49",
+    "HK_50",
+    "OTHER_1",
+    "OTHER_2",
+    "OTHER_3",
+    "OTHER_4",
+    "OTHER_5",
+    "OTHER_6",
+    "OTHER_7",
+    "OTHER_8",
+    "OTHER_9",
+    "OTHER_10",
+    "OTHER_11",
+    "OTHER_12",
+    "OTHER_13",
+    "OTHER_14"
+  ],
+  "edges": [
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_PROG_1",
+      "weight": 0.2,
+      "type": "prog_self"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_PROG_1",
+      "weight": 0.41369616873214543,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_PROG_1",
+      "weight": 0.376978671376387,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_PROG_1",
+      "weight": 0.35409735239361945,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_PROG_2",
+      "weight": 0.2,
+      "type": "prog_self"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_PROG_2",
+      "weight": 0.3516527635528529,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_PROG_2",
+      "weight": 0.4313270239200272,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_PROG_2",
+      "weight": 0.44127555772777216,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_PROG_3",
+      "weight": 0.2,
+      "type": "prog_self"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_PROG_3",
+      "weight": 0.41066357757671795,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_PROG_3",
+      "weight": 0.42294965609839985,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_PROG_3",
+      "weight": 0.40436249914654226,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_PROG_4",
+      "weight": 0.2,
+      "type": "prog_self"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_PROG_4",
+      "weight": 0.4435072423787768,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_PROG_4",
+      "weight": 0.4315853554121532,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_PROG_4",
+      "weight": 0.3502738500170148,
+      "type": "prog_mutual"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN1",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN1",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN1",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN1",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN2",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN2",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN2",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN2",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN3",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN3",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN3",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN3",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN4",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN4",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN4",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN4",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN5",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN5",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN5",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN5",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN6",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN6",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN6",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN6",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN7",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN7",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN7",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN7",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN8",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN8",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN8",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN8",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN9",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN9",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN9",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN9",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN10",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN10",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN10",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN10",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN11",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN11",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN11",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN11",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "TF_LIN12",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TF_LIN12",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "TF_LIN12",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "TF_LIN12",
+      "weight": 0.15,
+      "type": "prog_to_lineage"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN1",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN2",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN2",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN1",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN1",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN2",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN3",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN4",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN4",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN3",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN3",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN4",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN5",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN6",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN6",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN5",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN5",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN6",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN7",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN8",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN8",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN7",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN7",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN8",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN9",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN10",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN10",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN9",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN9",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN10",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN11",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN12",
+      "weight": 0.6,
+      "type": "lineage_self"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_LIN12",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_LIN11",
+      "weight": 0.4,
+      "type": "lineage_partner"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN11",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TF_LIN12",
+      "weight": -0.5,
+      "type": "lineage_inhibit"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_PROG_1",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_PROG_2",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_PROG_3",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TF_PROG_4",
+      "weight": -0.3,
+      "type": "lineage_repress_prog"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_1",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_2",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_3",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_4",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_5",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_6",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_7",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_8",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_9",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_10",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_11",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_12",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_13",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "TARG_14",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_1",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_2",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_3",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_4",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_5",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_6",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_7",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_8",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_9",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_10",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_11",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_12",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_13",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "TARG_14",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_15",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_16",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_17",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_18",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_19",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_20",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_21",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_22",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_23",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_24",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_25",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_26",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_27",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "TARG_28",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_15",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_16",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_17",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_18",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_19",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_20",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_21",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_22",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_23",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_24",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_25",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_26",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_27",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "TARG_28",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_29",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_30",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_31",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_32",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_33",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_34",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_35",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_36",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_37",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_38",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_39",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_40",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "TARG_41",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_29",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_30",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_31",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_32",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_33",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_34",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_35",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_36",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_37",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_38",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_39",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_40",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_41",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_42",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_43",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_44",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_45",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_46",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_47",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_48",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_49",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_50",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_51",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_52",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_53",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "TARG_54",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_42",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_43",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_44",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_45",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_46",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_47",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_48",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_49",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_50",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_51",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_52",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_53",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "TARG_54",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_55",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_56",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_57",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_58",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_59",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_60",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_61",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_62",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_63",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_64",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_65",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_66",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "TARG_67",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_55",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_56",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_57",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_58",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_59",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_60",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_61",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_62",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_63",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_64",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_65",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_66",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "TARG_67",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_68",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_69",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_70",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_71",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_72",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_73",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_74",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_75",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_76",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_77",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_78",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_79",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "TARG_80",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_68",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_69",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_70",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_71",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_72",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_73",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_74",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_75",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_76",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_77",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_78",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_79",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_80",
+      "weight": 0.7,
+      "type": "lineage_to_target"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "LIG_1",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "LIG_2",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "LIG_3",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN1",
+      "target": "LIG_4",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "LIG_1",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "LIG_2",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "LIG_3",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "LIG_4",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "LIG_5",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "LIG_6",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "LIG_7",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN3",
+      "target": "LIG_8",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "LIG_5",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "LIG_6",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "LIG_7",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "LIG_8",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "LIG_9",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "LIG_10",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "LIG_11",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "LIG_9",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "LIG_10",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "LIG_11",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "LIG_12",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "LIG_13",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN7",
+      "target": "LIG_14",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "LIG_12",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "LIG_13",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN8",
+      "target": "LIG_14",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "LIG_15",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "LIG_16",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN9",
+      "target": "LIG_17",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "LIG_15",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "LIG_16",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN10",
+      "target": "LIG_17",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "LIG_18",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "LIG_19",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "LIG_20",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "LIG_18",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "LIG_19",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "LIG_20",
+      "weight": 0.6,
+      "type": "lineage_to_ligand"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_1",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_2",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_3",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_4",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_5",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_6",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_7",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_8",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_9",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_10",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_11",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_12",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_13",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_14",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_15",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_16",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_17",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_18",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_19",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_1",
+      "target": "REC_20",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_1",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_2",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_3",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_4",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_5",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_6",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_7",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_8",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_9",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_10",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_11",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_12",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_13",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_14",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_15",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_16",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_17",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_18",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_19",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "REC_20",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_1",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_2",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_3",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_4",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_5",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_6",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_7",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_8",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_9",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_10",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_11",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_12",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_13",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_14",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_15",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_16",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_17",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_18",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_19",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "REC_20",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_1",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_2",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_3",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_4",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_5",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_6",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_7",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_8",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_9",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_10",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_11",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_12",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_13",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_14",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_15",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_16",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_17",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_18",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_19",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TF_PROG_4",
+      "target": "REC_20",
+      "weight": 0.2,
+      "type": "prog_to_receptor"
+    },
+    {
+      "source": "TARG_23",
+      "target": "HK_36",
+      "weight": -0.046641442469453565,
+      "type": "random"
+    },
+    {
+      "source": "HK_17",
+      "target": "HK_10",
+      "weight": -0.0324344379397441,
+      "type": "random"
+    },
+    {
+      "source": "LIG_2",
+      "target": "HK_37",
+      "weight": 0.004146122024909174,
+      "type": "random"
+    },
+    {
+      "source": "LIG_1",
+      "target": "TARG_4",
+      "weight": -0.007731277880234158,
+      "type": "random"
+    },
+    {
+      "source": "TARG_25",
+      "target": "TF_LIN2",
+      "weight": -0.037571672350043606,
+      "type": "random"
+    },
+    {
+      "source": "TF_PROG_2",
+      "target": "TARG_79",
+      "weight": 0.014718951157425011,
+      "type": "random"
+    },
+    {
+      "source": "REC_16",
+      "target": "TARG_68",
+      "weight": -0.011632244573811658,
+      "type": "random"
+    },
+    {
+      "source": "TARG_37",
+      "target": "OTHER_14",
+      "weight": 0.048083533877623014,
+      "type": "random"
+    },
+    {
+      "source": "TARG_20",
+      "target": "HK_2",
+      "weight": 0.015045927626781627,
+      "type": "random"
+    },
+    {
+      "source": "HK_33",
+      "target": "HK_2",
+      "weight": -0.01110785760208962,
+      "type": "random"
+    },
+    {
+      "source": "HK_40",
+      "target": "LIG_12",
+      "weight": 0.022148834019408176,
+      "type": "random"
+    },
+    {
+      "source": "HK_34",
+      "target": "TARG_50",
+      "weight": -0.018975812444104435,
+      "type": "random"
+    },
+    {
+      "source": "TARG_29",
+      "target": "TARG_42",
+      "weight": 0.03894878343490003,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN11",
+      "target": "OTHER_1",
+      "weight": -0.014220480329092976,
+      "type": "random"
+    },
+    {
+      "source": "TARG_79",
+      "target": "TARG_59",
+      "weight": -0.017813060892405787,
+      "type": "random"
+    },
+    {
+      "source": "HK_8",
+      "target": "TARG_63",
+      "weight": -0.016208877449286674,
+      "type": "random"
+    },
+    {
+      "source": "HK_17",
+      "target": "TARG_23",
+      "weight": 0.03902743520047923,
+      "type": "random"
+    },
+    {
+      "source": "REC_17",
+      "target": "REC_10",
+      "weight": 0.01231871446860424,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "LIG_1",
+      "weight": 0.033264414765339784,
+      "type": "random"
+    },
+    {
+      "source": "TARG_25",
+      "target": "HK_22",
+      "weight": -0.026063055700704787,
+      "type": "random"
+    },
+    {
+      "source": "HK_23",
+      "target": "HK_40",
+      "weight": -0.044143196519480565,
+      "type": "random"
+    },
+    {
+      "source": "TARG_79",
+      "target": "TARG_12",
+      "weight": -0.034972053310516095,
+      "type": "random"
+    },
+    {
+      "source": "HK_37",
+      "target": "TARG_35",
+      "weight": 0.029632427028729424,
+      "type": "random"
+    },
+    {
+      "source": "HK_6",
+      "target": "REC_11",
+      "weight": -0.04479786989355904,
+      "type": "random"
+    },
+    {
+      "source": "TARG_59",
+      "target": "TARG_25",
+      "weight": -0.03014869554907447,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_4",
+      "target": "LIG_3",
+      "weight": 0.008033238598685065,
+      "type": "random"
+    },
+    {
+      "source": "HK_44",
+      "target": "TARG_4",
+      "weight": 0.01719948779563593,
+      "type": "random"
+    },
+    {
+      "source": "HK_43",
+      "target": "REC_4",
+      "weight": 0.04421131105064978,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "TARG_18",
+      "weight": -0.03945047204297705,
+      "type": "random"
+    },
+    {
+      "source": "TARG_47",
+      "target": "TARG_70",
+      "weight": 0.04271545530678675,
+      "type": "random"
+    },
+    {
+      "source": "TARG_26",
+      "target": "TARG_33",
+      "weight": 0.04545904936907373,
+      "type": "random"
+    },
+    {
+      "source": "REC_4",
+      "target": "TARG_44",
+      "weight": -0.00747713751509245,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_4",
+      "target": "TARG_69",
+      "weight": 0.049509650523532414,
+      "type": "random"
+    },
+    {
+      "source": "TARG_65",
+      "target": "OTHER_4",
+      "weight": -0.003995486069090393,
+      "type": "random"
+    },
+    {
+      "source": "HK_31",
+      "target": "HK_16",
+      "weight": -0.0002577304512381001,
+      "type": "random"
+    },
+    {
+      "source": "TARG_29",
+      "target": "TARG_50",
+      "weight": 0.028578570071380746,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN12",
+      "target": "TARG_27",
+      "weight": 0.023448357178872933,
+      "type": "random"
+    },
+    {
+      "source": "HK_14",
+      "target": "HK_7",
+      "weight": 0.04320596866133783,
+      "type": "random"
+    },
+    {
+      "source": "REC_1",
+      "target": "LIG_7",
+      "weight": 0.02290151170763094,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_9",
+      "target": "HK_50",
+      "weight": 0.046792618992464646,
+      "type": "random"
+    },
+    {
+      "source": "HK_39",
+      "target": "TF_PROG_3",
+      "weight": 0.03636400902455758,
+      "type": "random"
+    },
+    {
+      "source": "LIG_1",
+      "target": "OTHER_11",
+      "weight": 0.04572101796109636,
+      "type": "random"
+    },
+    {
+      "source": "TARG_17",
+      "target": "LIG_14",
+      "weight": 0.047262881382295494,
+      "type": "random"
+    },
+    {
+      "source": "TARG_18",
+      "target": "HK_42",
+      "weight": 0.03223738275430704,
+      "type": "random"
+    },
+    {
+      "source": "REC_10",
+      "target": "TARG_40",
+      "weight": -0.026762708036069616,
+      "type": "random"
+    },
+    {
+      "source": "HK_43",
+      "target": "HK_25",
+      "weight": 0.04235301597834695,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_9",
+      "target": "REC_18",
+      "weight": 0.003893440762218689,
+      "type": "random"
+    },
+    {
+      "source": "TARG_76",
+      "target": "TARG_33",
+      "weight": 0.043101731598115506,
+      "type": "random"
+    },
+    {
+      "source": "HK_3",
+      "target": "TF_LIN5",
+      "weight": 0.023200619565656083,
+      "type": "random"
+    },
+    {
+      "source": "REC_1",
+      "target": "TARG_67",
+      "weight": -0.047163463488647896,
+      "type": "random"
+    },
+    {
+      "source": "HK_50",
+      "target": "HK_8",
+      "weight": -0.04840082704764281,
+      "type": "random"
+    },
+    {
+      "source": "LIG_3",
+      "target": "HK_16",
+      "weight": 0.001275872326207808,
+      "type": "random"
+    },
+    {
+      "source": "HK_44",
+      "target": "HK_50",
+      "weight": -0.04339175032759253,
+      "type": "random"
+    },
+    {
+      "source": "TARG_43",
+      "target": "HK_33",
+      "weight": -0.04333099912328986,
+      "type": "random"
+    },
+    {
+      "source": "TARG_75",
+      "target": "TARG_13",
+      "weight": -0.006970126805216671,
+      "type": "random"
+    },
+    {
+      "source": "HK_39",
+      "target": "OTHER_8",
+      "weight": 0.0062231842228457,
+      "type": "random"
+    },
+    {
+      "source": "HK_17",
+      "target": "REC_16",
+      "weight": -0.025832428590565504,
+      "type": "random"
+    },
+    {
+      "source": "REC_6",
+      "target": "HK_42",
+      "weight": -0.027413057158267563,
+      "type": "random"
+    },
+    {
+      "source": "LIG_10",
+      "target": "LIG_9",
+      "weight": -0.021166924299242242,
+      "type": "random"
+    },
+    {
+      "source": "HK_25",
+      "target": "TARG_62",
+      "weight": 0.00540905021732678,
+      "type": "random"
+    },
+    {
+      "source": "HK_17",
+      "target": "HK_26",
+      "weight": 0.00604759520061858,
+      "type": "random"
+    },
+    {
+      "source": "TARG_35",
+      "target": "TARG_2",
+      "weight": -0.008710365731910731,
+      "type": "random"
+    },
+    {
+      "source": "TARG_43",
+      "target": "HK_28",
+      "weight": 0.012650646241975344,
+      "type": "random"
+    },
+    {
+      "source": "HK_7",
+      "target": "OTHER_6",
+      "weight": -0.013059558890831914,
+      "type": "random"
+    },
+    {
+      "source": "LIG_1",
+      "target": "TARG_55",
+      "weight": 0.009392420161316826,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN2",
+      "target": "HK_34",
+      "weight": -0.03545264618134683,
+      "type": "random"
+    },
+    {
+      "source": "HK_28",
+      "target": "TARG_26",
+      "weight": 0.0409958961662297,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_3",
+      "target": "TF_LIN5",
+      "weight": 0.0322706280181502,
+      "type": "random"
+    },
+    {
+      "source": "HK_22",
+      "target": "TARG_28",
+      "weight": 0.032980398527810276,
+      "type": "random"
+    },
+    {
+      "source": "LIG_7",
+      "target": "TF_PROG_2",
+      "weight": -0.013495384224172936,
+      "type": "random"
+    },
+    {
+      "source": "LIG_6",
+      "target": "TF_LIN12",
+      "weight": 0.01526145763366385,
+      "type": "random"
+    },
+    {
+      "source": "TARG_49",
+      "target": "REC_19",
+      "weight": 0.020265207065978633,
+      "type": "random"
+    },
+    {
+      "source": "TARG_71",
+      "target": "OTHER_3",
+      "weight": -0.037318289773875225,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN4",
+      "target": "HK_37",
+      "weight": -0.04405358483996616,
+      "type": "random"
+    },
+    {
+      "source": "TARG_40",
+      "target": "TARG_21",
+      "weight": -0.007022593882142339,
+      "type": "random"
+    },
+    {
+      "source": "TARG_7",
+      "target": "TARG_42",
+      "weight": 0.04764623219360446,
+      "type": "random"
+    },
+    {
+      "source": "HK_3",
+      "target": "HK_20",
+      "weight": -0.0191142637280739,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_11",
+      "target": "REC_18",
+      "weight": 0.03631202041893178,
+      "type": "random"
+    },
+    {
+      "source": "TARG_72",
+      "target": "HK_41",
+      "weight": 0.0010706505543645259,
+      "type": "random"
+    },
+    {
+      "source": "TARG_72",
+      "target": "TARG_13",
+      "weight": 0.04949173481609179,
+      "type": "random"
+    },
+    {
+      "source": "HK_12",
+      "target": "TARG_8",
+      "weight": -0.03172876210734375,
+      "type": "random"
+    },
+    {
+      "source": "REC_19",
+      "target": "HK_41",
+      "weight": 0.031233539811125408,
+      "type": "random"
+    },
+    {
+      "source": "REC_19",
+      "target": "TARG_78",
+      "weight": 0.04584136317779519,
+      "type": "random"
+    },
+    {
+      "source": "TARG_58",
+      "target": "HK_50",
+      "weight": 0.02482485033017541,
+      "type": "random"
+    },
+    {
+      "source": "TARG_70",
+      "target": "HK_37",
+      "weight": -0.025285325967789252,
+      "type": "random"
+    },
+    {
+      "source": "TARG_57",
+      "target": "LIG_13",
+      "weight": 0.017006184931493598,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "HK_7",
+      "weight": -0.03329470712177278,
+      "type": "random"
+    },
+    {
+      "source": "HK_1",
+      "target": "TARG_24",
+      "weight": 0.04102557662160548,
+      "type": "random"
+    },
+    {
+      "source": "TARG_60",
+      "target": "TARG_57",
+      "weight": 0.007833591492627266,
+      "type": "random"
+    },
+    {
+      "source": "HK_14",
+      "target": "REC_3",
+      "weight": 0.0026022248617875166,
+      "type": "random"
+    },
+    {
+      "source": "HK_15",
+      "target": "TARG_49",
+      "weight": -0.04110643597537281,
+      "type": "random"
+    },
+    {
+      "source": "TARG_50",
+      "target": "OTHER_11",
+      "weight": 0.007139560045577441,
+      "type": "random"
+    },
+    {
+      "source": "TARG_34",
+      "target": "TF_PROG_2",
+      "weight": 0.027264920122538866,
+      "type": "random"
+    },
+    {
+      "source": "HK_13",
+      "target": "OTHER_10",
+      "weight": 0.008987002832095047,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_8",
+      "target": "TARG_8",
+      "weight": -0.031249228427221512,
+      "type": "random"
+    },
+    {
+      "source": "TARG_17",
+      "target": "TARG_79",
+      "weight": -0.0304892601543195,
+      "type": "random"
+    },
+    {
+      "source": "TARG_76",
+      "target": "TARG_60",
+      "weight": 0.010223917637962578,
+      "type": "random"
+    },
+    {
+      "source": "HK_41",
+      "target": "OTHER_7",
+      "weight": -0.04277347344701232,
+      "type": "random"
+    },
+    {
+      "source": "TARG_45",
+      "target": "TARG_44",
+      "weight": 0.02440974792826482,
+      "type": "random"
+    },
+    {
+      "source": "TARG_8",
+      "target": "LIG_20",
+      "weight": -0.011193326821548076,
+      "type": "random"
+    },
+    {
+      "source": "HK_50",
+      "target": "TF_LIN9",
+      "weight": 0.02258808637757767,
+      "type": "random"
+    },
+    {
+      "source": "REC_19",
+      "target": "LIG_2",
+      "weight": -0.010490829164203241,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_10",
+      "target": "HK_39",
+      "weight": -0.002769966324998853,
+      "type": "random"
+    },
+    {
+      "source": "TARG_64",
+      "target": "HK_47",
+      "weight": 0.026591711773887236,
+      "type": "random"
+    },
+    {
+      "source": "HK_50",
+      "target": "HK_48",
+      "weight": -0.03725969909510937,
+      "type": "random"
+    },
+    {
+      "source": "TARG_63",
+      "target": "TF_LIN11",
+      "weight": -0.0429673746430782,
+      "type": "random"
+    },
+    {
+      "source": "REC_7",
+      "target": "HK_38",
+      "weight": 0.013406997934744327,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_12",
+      "target": "TARG_44",
+      "weight": -0.033645658380351974,
+      "type": "random"
+    },
+    {
+      "source": "REC_17",
+      "target": "TARG_79",
+      "weight": -0.018198261215420196,
+      "type": "random"
+    },
+    {
+      "source": "LIG_7",
+      "target": "HK_7",
+      "weight": -0.00396446711326752,
+      "type": "random"
+    },
+    {
+      "source": "HK_13",
+      "target": "TARG_46",
+      "weight": 0.028966573245987046,
+      "type": "random"
+    },
+    {
+      "source": "REC_9",
+      "target": "LIG_3",
+      "weight": 0.007875850332350255,
+      "type": "random"
+    },
+    {
+      "source": "REC_17",
+      "target": "REC_4",
+      "weight": 0.030813675181356817,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_5",
+      "target": "TARG_42",
+      "weight": 0.04886953333678197,
+      "type": "random"
+    },
+    {
+      "source": "TARG_45",
+      "target": "REC_1",
+      "weight": 0.046301914012426726,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN5",
+      "target": "HK_25",
+      "weight": -0.0018739503424731394,
+      "type": "random"
+    },
+    {
+      "source": "HK_31",
+      "target": "HK_27",
+      "weight": 0.010284890524111634,
+      "type": "random"
+    },
+    {
+      "source": "HK_17",
+      "target": "TARG_76",
+      "weight": 0.041369076270738894,
+      "type": "random"
+    },
+    {
+      "source": "HK_41",
+      "target": "TF_LIN10",
+      "weight": 0.033498820395840054,
+      "type": "random"
+    },
+    {
+      "source": "LIG_1",
+      "target": "TARG_21",
+      "weight": -0.01744543838992956,
+      "type": "random"
+    },
+    {
+      "source": "HK_4",
+      "target": "OTHER_13",
+      "weight": 0.028119050207637816,
+      "type": "random"
+    },
+    {
+      "source": "LIG_8",
+      "target": "TARG_42",
+      "weight": -0.00773716035752188,
+      "type": "random"
+    },
+    {
+      "source": "TF_PROG_3",
+      "target": "HK_40",
+      "weight": -0.04131851277851059,
+      "type": "random"
+    },
+    {
+      "source": "HK_28",
+      "target": "HK_6",
+      "weight": 0.028915462370514608,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_7",
+      "target": "HK_24",
+      "weight": -0.017771327526016824,
+      "type": "random"
+    },
+    {
+      "source": "TARG_66",
+      "target": "HK_24",
+      "weight": -0.02746715581243349,
+      "type": "random"
+    },
+    {
+      "source": "TARG_27",
+      "target": "TARG_17",
+      "weight": -0.008255188779562016,
+      "type": "random"
+    },
+    {
+      "source": "TARG_28",
+      "target": "TARG_53",
+      "weight": -0.03873863344594428,
+      "type": "random"
+    },
+    {
+      "source": "HK_49",
+      "target": "TARG_26",
+      "weight": -0.049969930989307715,
+      "type": "random"
+    },
+    {
+      "source": "TARG_31",
+      "target": "HK_13",
+      "weight": 0.0351875912234257,
+      "type": "random"
+    },
+    {
+      "source": "REC_4",
+      "target": "LIG_12",
+      "weight": 0.020378576926679784,
+      "type": "random"
+    },
+    {
+      "source": "TARG_4",
+      "target": "HK_29",
+      "weight": 0.048182832287179386,
+      "type": "random"
+    },
+    {
+      "source": "TF_LIN6",
+      "target": "HK_33",
+      "weight": -0.007589351455598713,
+      "type": "random"
+    },
+    {
+      "source": "TARG_6",
+      "target": "OTHER_10",
+      "weight": 0.04739844048523552,
+      "type": "random"
+    },
+    {
+      "source": "TARG_27",
+      "target": "TARG_45",
+      "weight": 0.02534465385839052,
+      "type": "random"
+    },
+    {
+      "source": "TARG_46",
+      "target": "HK_47",
+      "weight": -0.002385292803124696,
+      "type": "random"
+    },
+    {
+      "source": "REC_14",
+      "target": "HK_37",
+      "weight": 0.02015685660618728,
+      "type": "random"
+    },
+    {
+      "source": "HK_47",
+      "target": "TARG_3",
+      "weight": 0.026765226998347366,
+      "type": "random"
+    },
+    {
+      "source": "TARG_63",
+      "target": "TARG_59",
+      "weight": -0.04061548465666938,
+      "type": "random"
+    },
+    {
+      "source": "REC_19",
+      "target": "TARG_23",
+      "weight": -0.04262589866021941,
+      "type": "random"
+    },
+    {
+      "source": "TARG_35",
+      "target": "TARG_40",
+      "weight": -0.007146039185707623,
+      "type": "random"
+    },
+    {
+      "source": "TARG_74",
+      "target": "TARG_29",
+      "weight": 0.008630035359078435,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_11",
+      "target": "LIG_9",
+      "weight": 0.04337689099568427,
+      "type": "random"
+    },
+    {
+      "source": "TARG_4",
+      "target": "HK_1",
+      "weight": 0.032378135839277164,
+      "type": "random"
+    },
+    {
+      "source": "TARG_62",
+      "target": "HK_44",
+      "weight": 0.008332004692347593,
+      "type": "random"
+    },
+    {
+      "source": "TARG_42",
+      "target": "TF_LIN5",
+      "weight": 0.021148682411775796,
+      "type": "random"
+    },
+    {
+      "source": "TARG_72",
+      "target": "TARG_58",
+      "weight": 0.03259572221703992,
+      "type": "random"
+    },
+    {
+      "source": "HK_24",
+      "target": "TARG_51",
+      "weight": 0.03132440953641924,
+      "type": "random"
+    },
+    {
+      "source": "TARG_49",
+      "target": "OTHER_14",
+      "weight": -0.014944518863211187,
+      "type": "random"
+    },
+    {
+      "source": "HK_25",
+      "target": "LIG_19",
+      "weight": -0.010832520054609718,
+      "type": "random"
+    },
+    {
+      "source": "HK_10",
+      "target": "HK_15",
+      "weight": -0.006077106814169356,
+      "type": "random"
+    },
+    {
+      "source": "TARG_68",
+      "target": "TARG_62",
+      "weight": -0.0372641528078329,
+      "type": "random"
+    },
+    {
+      "source": "TARG_8",
+      "target": "HK_10",
+      "weight": -0.021991759813350054,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_10",
+      "target": "REC_3",
+      "weight": 0.03629499985831945,
+      "type": "random"
+    },
+    {
+      "source": "LIG_16",
+      "target": "TARG_57",
+      "weight": -0.0015501057653749678,
+      "type": "random"
+    },
+    {
+      "source": "TARG_66",
+      "target": "HK_44",
+      "weight": -0.04139875639389974,
+      "type": "random"
+    },
+    {
+      "source": "LIG_20",
+      "target": "HK_4",
+      "weight": -0.01720177102353975,
+      "type": "random"
+    },
+    {
+      "source": "TARG_62",
+      "target": "LIG_20",
+      "weight": 0.017479864996727892,
+      "type": "random"
+    },
+    {
+      "source": "REC_10",
+      "target": "TARG_17",
+      "weight": -0.017010416750606418,
+      "type": "random"
+    },
+    {
+      "source": "TARG_69",
+      "target": "OTHER_3",
+      "weight": -0.030070165932051387,
+      "type": "random"
+    },
+    {
+      "source": "TARG_2",
+      "target": "TARG_47",
+      "weight": -0.047598679932865075,
+      "type": "random"
+    },
+    {
+      "source": "TARG_73",
+      "target": "LIG_17",
+      "weight": 0.03834187336335619,
+      "type": "random"
+    },
+    {
+      "source": "REC_3",
+      "target": "HK_22",
+      "weight": 0.0056835490053990245,
+      "type": "random"
+    },
+    {
+      "source": "TARG_78",
+      "target": "REC_9",
+      "weight": 0.0057747582621306415,
+      "type": "random"
+    },
+    {
+      "source": "TARG_28",
+      "target": "TF_PROG_3",
+      "weight": 0.021299363093792073,
+      "type": "random"
+    },
+    {
+      "source": "TARG_26",
+      "target": "HK_8",
+      "weight": 0.01460450235663549,
+      "type": "random"
+    },
+    {
+      "source": "HK_13",
+      "target": "TARG_67",
+      "weight": -0.04262835673754625,
+      "type": "random"
+    },
+    {
+      "source": "TARG_67",
+      "target": "REC_14",
+      "weight": 0.00743780480979319,
+      "type": "random"
+    },
+    {
+      "source": "TARG_67",
+      "target": "TARG_23",
+      "weight": 0.04920232285814451,
+      "type": "random"
+    },
+    {
+      "source": "HK_16",
+      "target": "HK_49",
+      "weight": -0.0347992097477463,
+      "type": "random"
+    },
+    {
+      "source": "TARG_16",
+      "target": "TARG_62",
+      "weight": 0.019621510610345658,
+      "type": "random"
+    },
+    {
+      "source": "HK_46",
+      "target": "LIG_12",
+      "weight": -0.018740435289882874,
+      "type": "random"
+    },
+    {
+      "source": "LIG_18",
+      "target": "HK_8",
+      "weight": 0.04011080934228366,
+      "type": "random"
+    },
+    {
+      "source": "TARG_1",
+      "target": "TARG_13",
+      "weight": -0.026105628830871943,
+      "type": "random"
+    },
+    {
+      "source": "HK_33",
+      "target": "HK_29",
+      "weight": 0.008498268022567833,
+      "type": "random"
+    },
+    {
+      "source": "HK_40",
+      "target": "TARG_40",
+      "weight": -0.024384997857210766,
+      "type": "random"
+    },
+    {
+      "source": "REC_10",
+      "target": "TF_LIN11",
+      "weight": -0.048210857910302475,
+      "type": "random"
+    },
+    {
+      "source": "LIG_20",
+      "target": "TARG_60",
+      "weight": -0.03088897265399252,
+      "type": "random"
+    },
+    {
+      "source": "TARG_47",
+      "target": "OTHER_10",
+      "weight": -0.039252277161385275,
+      "type": "random"
+    },
+    {
+      "source": "HK_15",
+      "target": "TARG_35",
+      "weight": -0.010534020292903998,
+      "type": "random"
+    },
+    {
+      "source": "HK_32",
+      "target": "REC_11",
+      "weight": 0.024875572500393503,
+      "type": "random"
+    },
+    {
+      "source": "TARG_27",
+      "target": "TARG_73",
+      "weight": 0.022575768505186986,
+      "type": "random"
+    },
+    {
+      "source": "TARG_5",
+      "target": "LIG_1",
+      "weight": -0.014725658430359494,
+      "type": "random"
+    },
+    {
+      "source": "TARG_73",
+      "target": "TARG_48",
+      "weight": -0.007327885626975894,
+      "type": "random"
+    },
+    {
+      "source": "HK_42",
+      "target": "TF_LIN5",
+      "weight": -0.03059725450992068,
+      "type": "random"
+    },
+    {
+      "source": "TARG_21",
+      "target": "OTHER_4",
+      "weight": -0.03374302752466818,
+      "type": "random"
+    },
+    {
+      "source": "TARG_26",
+      "target": "HK_35",
+      "weight": 0.03221371590644401,
+      "type": "random"
+    },
+    {
+      "source": "HK_20",
+      "target": "TARG_23",
+      "weight": -0.00332164801557365,
+      "type": "random"
+    },
+    {
+      "source": "HK_5",
+      "target": "HK_29",
+      "weight": 0.01806863255702125,
+      "type": "random"
+    },
+    {
+      "source": "TARG_55",
+      "target": "HK_32",
+      "weight": 0.025759658583212372,
+      "type": "random"
+    },
+    {
+      "source": "HK_35",
+      "target": "HK_3",
+      "weight": 0.04129741060068781,
+      "type": "random"
+    },
+    {
+      "source": "TARG_56",
+      "target": "HK_29",
+      "weight": -0.032093731241700674,
+      "type": "random"
+    },
+    {
+      "source": "TARG_54",
+      "target": "HK_14",
+      "weight": -0.04133186768854572,
+      "type": "random"
+    },
+    {
+      "source": "HK_37",
+      "target": "TARG_30",
+      "weight": -0.010324811284657474,
+      "type": "random"
+    },
+    {
+      "source": "HK_48",
+      "target": "REC_5",
+      "weight": 0.04379051086359893,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_11",
+      "target": "LIG_3",
+      "weight": -0.04951005850114244,
+      "type": "random"
+    },
+    {
+      "source": "OTHER_1",
+      "target": "TARG_9",
+      "weight": 0.04907447182412221,
+      "type": "random"
+    },
+    {
+      "source": "HK_32",
+      "target": "REC_17",
+      "weight": 0.0330694265517731,
+      "type": "random"
+    },
+    {
+      "source": "TARG_43",
+      "target": "LIG_19",
+      "weight": 0.008637835479837777,
+      "type": "random"
+    },
+    {
+      "source": "HK_20",
+      "target": "OTHER_6",
+      "weight": 0.021651323456580704,
+      "type": "random"
+    }
+  ],
+  "ligand_receptor_pairs": [
+    {
+      "pair_id": 0,
+      "ligand": 16,
+      "receptor": 36
+    },
+    {
+      "pair_id": 1,
+      "ligand": 17,
+      "receptor": 37
+    },
+    {
+      "pair_id": 2,
+      "ligand": 18,
+      "receptor": 38
+    },
+    {
+      "pair_id": 3,
+      "ligand": 19,
+      "receptor": 39
+    },
+    {
+      "pair_id": 4,
+      "ligand": 20,
+      "receptor": 40
+    },
+    {
+      "pair_id": 5,
+      "ligand": 21,
+      "receptor": 41
+    },
+    {
+      "pair_id": 6,
+      "ligand": 22,
+      "receptor": 42
+    },
+    {
+      "pair_id": 7,
+      "ligand": 23,
+      "receptor": 43
+    },
+    {
+      "pair_id": 8,
+      "ligand": 24,
+      "receptor": 44
+    },
+    {
+      "pair_id": 9,
+      "ligand": 25,
+      "receptor": 45
+    },
+    {
+      "pair_id": 10,
+      "ligand": 26,
+      "receptor": 46
+    },
+    {
+      "pair_id": 11,
+      "ligand": 27,
+      "receptor": 47
+    },
+    {
+      "pair_id": 12,
+      "ligand": 28,
+      "receptor": 48
+    },
+    {
+      "pair_id": 13,
+      "ligand": 29,
+      "receptor": 49
+    },
+    {
+      "pair_id": 14,
+      "ligand": 30,
+      "receptor": 50
+    },
+    {
+      "pair_id": 15,
+      "ligand": 31,
+      "receptor": 51
+    },
+    {
+      "pair_id": 16,
+      "ligand": 32,
+      "receptor": 52
+    },
+    {
+      "pair_id": 17,
+      "ligand": 33,
+      "receptor": 53
+    },
+    {
+      "pair_id": 18,
+      "ligand": 34,
+      "receptor": 54
+    },
+    {
+      "pair_id": 19,
+      "ligand": 35,
+      "receptor": 55
+    }
+  ]
+}
