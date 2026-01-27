@@ -415,6 +415,35 @@ body {
   accent-color: var(--accent-cyan);
 }
 
+.config-group select {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.5rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.config-group select:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+}
+
+.config-hint {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  line-height: 1.3;
+}
+
+.morphogen-sub-option {
+  margin-left: 1.5rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--border-color);
+}
+
 /* Buttons */
 .button-group {
   display: flex;

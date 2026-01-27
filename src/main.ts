@@ -97,6 +97,15 @@ let minWeight = 0;
 let showLabels = true;
 let currentLayout = 'cola';
 
+// Debounce helper for expensive operations
+function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number): T {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  return ((...args: unknown[]) => {
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), ms);
+  }) as T;
+}
+
 // Helper
 function createElementWithText(tag: string, text: string, className?: string): HTMLElement {
   const el = document.createElement(tag);
@@ -108,33 +117,54 @@ function createElementWithText(tag: string, text: string, className?: string): H
 function init() {
   const data = grnData as GRNData;
 
-  // Build nodes
+  // Build nodes with pre-computed styles
   const nodeSet = new Set<string>();
   data.edges.forEach(e => {
     nodeSet.add(e.source);
     nodeSet.add(e.target);
   });
 
-  const nodes = Array.from(nodeSet).map(id => ({
-    data: {
-      id,
-      type: getGeneType(id),
-      label: id,
-    },
-  }));
+  const getNodeSize = (type: string): number => {
+    if (type === 'TF_PROG') return 30;
+    if (type === 'TF_LIN') return 24;
+    return 16;
+  };
 
-  // Build edges
-  const edges = data.edges.map((e, i) => ({
-    data: {
-      id: `e${i}`,
-      source: e.source,
-      target: e.target,
-      weight: e.weight,
-      edgeType: e.type,
-    },
-  }));
+  const nodes = Array.from(nodeSet).map(id => {
+    const type = getGeneType(id);
+    return {
+      data: {
+        id,
+        type,
+        label: id,
+        // Pre-computed styles
+        nodeColor: getNodeColor(type),
+        nodeSize: getNodeSize(type),
+      },
+    };
+  });
 
-  // Initialize Cytoscape
+  // Build edges with pre-computed styles
+  const edges = data.edges.map((e, i) => {
+    const absWeight = Math.abs(e.weight);
+    return {
+      data: {
+        id: `e${i}`,
+        source: e.source,
+        target: e.target,
+        weight: e.weight,
+        edgeType: e.type,
+        // Pre-computed styles
+        edgeColor: getEdgeColor(e.type),
+        edgeWidth: Math.max(1, absWeight * 3),
+        edgeOpacity: Math.min(0.8, 0.3 + absWeight * 0.5),
+        arrowShape: e.weight < 0 ? 'tee' : 'triangle',
+        lineStyle: e.weight < 0 ? 'dashed' : 'solid',
+      },
+    };
+  });
+
+  // Initialize Cytoscape with pre-computed styles (no functions = faster rendering)
   cy = cytoscape({
     container: document.getElementById('network-container'),
     elements: { nodes, edges },
@@ -142,25 +172,15 @@ function init() {
       {
         selector: 'node',
         style: {
-          'background-color': (ele: NodeSingular) => getNodeColor(ele.data('type')),
+          'background-color': 'data(nodeColor)',
           'label': 'data(label)',
           'color': '#e6edf3',
           'text-valign': 'bottom',
           'text-halign': 'center',
           'font-size': '10px',
           'text-margin-y': 5,
-          'width': (ele: NodeSingular) => {
-            const type = ele.data('type');
-            if (type === 'TF_PROG') return 30;
-            if (type === 'TF_LIN') return 24;
-            return 16;
-          },
-          'height': (ele: NodeSingular) => {
-            const type = ele.data('type');
-            if (type === 'TF_PROG') return 30;
-            if (type === 'TF_LIN') return 24;
-            return 16;
-          },
+          'width': 'data(nodeSize)',
+          'height': 'data(nodeSize)',
           'border-width': 2,
           'border-color': '#0d1117',
         },
@@ -175,13 +195,13 @@ function init() {
       {
         selector: 'edge',
         style: {
-          'width': (ele: EdgeSingular) => Math.max(1, Math.abs(ele.data('weight')) * 3),
-          'line-color': (ele: EdgeSingular) => getEdgeColor(ele.data('edgeType')),
-          'target-arrow-color': (ele: EdgeSingular) => getEdgeColor(ele.data('edgeType')),
-          'target-arrow-shape': (ele: EdgeSingular) => ele.data('weight') < 0 ? 'tee' : 'triangle',
+          'width': 'data(edgeWidth)',
+          'line-color': 'data(edgeColor)',
+          'target-arrow-color': 'data(edgeColor)',
+          'target-arrow-shape': 'data(arrowShape)',
           'curve-style': 'bezier',
-          'opacity': (ele: EdgeSingular) => Math.min(0.8, 0.3 + Math.abs(ele.data('weight')) * 0.5),
-          'line-style': (ele: EdgeSingular) => ele.data('weight') < 0 ? 'dashed' : 'solid',
+          'opacity': 'data(edgeOpacity)',
+          'line-style': 'data(lineStyle)',
         },
       },
       {
@@ -217,11 +237,15 @@ function init() {
       edgeLengthVal: 80,
       animate: false,
       randomize: true,
-      maxSimulationTime: 4000,
+      maxSimulationTime: 2000, // Reduced from 4000
     } as cytoscape.LayoutOptions,
     wheelSensitivity: 0.3,
     minZoom: 0.1,
     maxZoom: 5,
+    // Performance options
+    textureOnViewport: true,
+    hideEdgesOnViewport: true,
+    hideLabelsOnViewport: true,
   });
 
   // Event handlers
@@ -253,27 +277,55 @@ function init() {
 }
 
 function updateVisibility() {
-  // Update node visibility
-  cy.nodes().forEach(node => {
-    const type = node.data('type');
-    if (activeGeneTypes.has(type)) {
-      node.removeClass('hidden');
-    } else {
-      node.addClass('hidden');
+  // Use batch for better performance
+  cy.batch(() => {
+    // Collect nodes to show/hide
+    const nodesToShow: NodeSingular[] = [];
+    const nodesToHide: NodeSingular[] = [];
+
+    cy.nodes().forEach(node => {
+      const type = node.data('type');
+      if (activeGeneTypes.has(type)) {
+        nodesToShow.push(node);
+      } else {
+        nodesToHide.push(node);
+      }
+    });
+
+    // Apply node visibility in batch
+    if (nodesToShow.length > 0) {
+      cy.collection(nodesToShow).removeClass('hidden');
     }
-  });
+    if (nodesToHide.length > 0) {
+      cy.collection(nodesToHide).addClass('hidden');
+    }
 
-  // Update edge visibility
-  cy.edges().forEach(edge => {
-    const edgeType = edge.data('edgeType');
-    const weight = Math.abs(edge.data('weight'));
-    const sourceVisible = !edge.source().hasClass('hidden');
-    const targetVisible = !edge.target().hasClass('hidden');
+    // Build set of hidden node IDs for fast lookup
+    const hiddenNodeIds = new Set(nodesToHide.map(n => n.id()));
 
-    if (activeEdgeTypes.has(edgeType) && weight >= minWeight && sourceVisible && targetVisible) {
-      edge.removeClass('hidden');
-    } else {
-      edge.addClass('hidden');
+    // Collect edges to show/hide
+    const edgesToShow: EdgeSingular[] = [];
+    const edgesToHide: EdgeSingular[] = [];
+
+    cy.edges().forEach(edge => {
+      const edgeType = edge.data('edgeType');
+      const weight = Math.abs(edge.data('weight'));
+      const sourceHidden = hiddenNodeIds.has(edge.source().id());
+      const targetHidden = hiddenNodeIds.has(edge.target().id());
+
+      if (activeEdgeTypes.has(edgeType) && weight >= minWeight && !sourceHidden && !targetHidden) {
+        edgesToShow.push(edge);
+      } else {
+        edgesToHide.push(edge);
+      }
+    });
+
+    // Apply edge visibility in batch
+    if (edgesToShow.length > 0) {
+      cy.collection(edgesToShow).removeClass('hidden');
+    }
+    if (edgesToHide.length > 0) {
+      cy.collection(edgesToHide).addClass('hidden');
     }
   });
 
@@ -281,22 +333,27 @@ function updateVisibility() {
 }
 
 function selectNode(node: NodeSingular) {
-  // Clear previous highlighting
-  cy.elements().removeClass('highlighted faded');
+  // Use batch for better performance
+  cy.batch(() => {
+    // Clear previous highlighting
+    cy.elements().removeClass('highlighted faded');
 
-  // Get connected elements
-  const neighborhood = node.neighborhood().add(node);
+    // Get connected elements
+    const neighborhood = node.neighborhood().add(node);
 
-  // Highlight neighborhood, fade others
-  neighborhood.addClass('highlighted');
-  cy.elements().not(neighborhood).addClass('faded');
+    // Highlight neighborhood, fade others
+    neighborhood.addClass('highlighted');
+    cy.elements().not(neighborhood).addClass('faded');
+  });
 
   // Update details panel
   updateNodeDetails(node);
 }
 
 function clearSelection() {
-  cy.elements().removeClass('highlighted faded');
+  cy.batch(() => {
+    cy.elements().removeClass('highlighted faded');
+  });
   const details = document.getElementById('node-details')!;
   details.replaceChildren();
   const placeholder = createElementWithText('p', 'Click a node to see details', 'placeholder');
@@ -441,14 +498,26 @@ function updateNodeDetails(node: NodeSingular) {
 }
 
 function updateStats() {
-  const visibleNodes = cy.nodes().filter((n: NodeSingular) => !n.hasClass('hidden'));
-  const visibleEdges = cy.edges().filter((e: EdgeSingular) => !e.hasClass('hidden'));
+  // Count in a single pass for better performance
+  let visibleNodes = 0;
+  let visibleEdges = 0;
+  let activating = 0;
+  let inhibiting = 0;
 
-  const activating = visibleEdges.filter((e: EdgeSingular) => e.data('weight') > 0).length;
-  const inhibiting = visibleEdges.filter((e: EdgeSingular) => e.data('weight') < 0).length;
+  cy.nodes().forEach((n: NodeSingular) => {
+    if (!n.hasClass('hidden')) visibleNodes++;
+  });
 
-  document.getElementById('stat-genes')!.textContent = String(visibleNodes.length);
-  document.getElementById('stat-edges')!.textContent = String(visibleEdges.length);
+  cy.edges().forEach((e: EdgeSingular) => {
+    if (!e.hasClass('hidden')) {
+      visibleEdges++;
+      if (e.data('weight') > 0) activating++;
+      else inhibiting++;
+    }
+  });
+
+  document.getElementById('stat-genes')!.textContent = String(visibleNodes);
+  document.getElementById('stat-edges')!.textContent = String(visibleEdges);
   document.getElementById('stat-activating')!.textContent = String(activating);
   document.getElementById('stat-inhibiting')!.textContent = String(inhibiting);
 }
@@ -542,13 +611,14 @@ function setupControls() {
     cy.style().selector('node').style('label', showLabels ? 'data(label)' : '').update();
   });
 
-  // Min weight slider
+  // Min weight slider with debounced visibility update
   const minWeightSlider = document.getElementById('min-weight') as HTMLInputElement;
   const minWeightVal = document.getElementById('min-weight-val')!;
+  const debouncedVisibility = debounce(updateVisibility, 50);
   minWeightSlider.addEventListener('input', () => {
     minWeight = parseFloat(minWeightSlider.value);
     minWeightVal.textContent = minWeight.toFixed(2);
-    updateVisibility();
+    debouncedVisibility();
   });
 
   // Layout buttons
@@ -581,8 +651,10 @@ function applyLayout(layout: string) {
         nodeSpacing: 40,
         edgeLengthVal: 80,
         animate: true,
+        animationDuration: 500,
         randomize: false,
-        maxSimulationTime: 3000,
+        maxSimulationTime: 1500, // Reduced for faster layout
+        convergenceThreshold: 0.01, // Stop earlier when converged
       } as cytoscape.LayoutOptions;
       break;
 
@@ -593,6 +665,7 @@ function applyLayout(layout: string) {
         nodeSep: 50,
         rankSep: 100,
         animate: true,
+        animationDuration: 300,
       } as cytoscape.LayoutOptions;
       break;
 
@@ -607,6 +680,7 @@ function applyLayout(layout: string) {
         levelWidth: () => 2,
         minNodeSpacing: 30,
         animate: true,
+        animationDuration: 300,
       } as cytoscape.LayoutOptions;
       break;
 

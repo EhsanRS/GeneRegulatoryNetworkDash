@@ -109,20 +109,44 @@
           <div class="viz-panel expression-panel">
             <div class="viz-header">
               <button class="panel-toggle" data-target="row-gene-expr" title="Minimize">−</button>
-              <h3>Gene Expression Dynamics</h3>
+              <h3>Dynamics</h3>
+              <div class="dynamics-tabs">
+                <button class="dynamics-tab active" data-tab="expression">Gene Expression</button>
+                <button class="dynamics-tab" data-tab="proportions">Lineage Proportions</button>
+              </div>
               <button id="btn-reset-expr-zoom" class="zoom-reset-btn" title="Reset zoom">⟲ Reset Zoom</button>
             </div>
             <div class="viz-content">
-              <div class="gene-selector">
-                <button class="gene-btn active" data-genes="tf_prog">Prog TFs</button>
-                <button class="gene-btn" data-genes="tf_lin">Lin TFs</button>
-                <button class="gene-btn" data-genes="ligands">Ligands</button>
-                <button class="gene-btn" data-genes="receptors">Receptors</button>
-                <button class="gene-btn" data-genes="targets">Targets</button>
-                <button class="gene-btn" data-genes="housekeeping">HK</button>
-                <button class="gene-btn" data-genes="other">Other</button>
+              <!-- Gene Expression Tab Content -->
+              <div id="expression-tab-content" class="tab-content active">
+                <div class="expression-controls">
+                  <div class="gene-selector">
+                    <button class="gene-btn active" data-genes="tf_prog">Prog TFs</button>
+                    <button class="gene-btn" data-genes="tf_lin">Lin TFs</button>
+                    <button class="gene-btn" data-genes="ligands">Ligands</button>
+                    <button class="gene-btn" data-genes="receptors">Receptors</button>
+                    <button class="gene-btn" data-genes="targets">Targets</button>
+                    <button class="gene-btn" data-genes="housekeeping">HK</button>
+                    <button class="gene-btn" data-genes="other">Other</button>
+                    <button class="gene-btn" data-genes="custom">Custom</button>
+                  </div>
+                  <div id="custom-gene-selector" class="custom-gene-selector hidden">
+                    <div class="custom-gene-header">
+                      <span>Select Individual Genes</span>
+                      <div class="custom-gene-actions">
+                        <button id="btn-clear-custom-genes">Clear</button>
+                        <button id="btn-select-all-tfs">All TFs</button>
+                      </div>
+                    </div>
+                    <div id="custom-gene-checkboxes" class="custom-gene-checkboxes"></div>
+                  </div>
+                </div>
+                <canvas id="expression-canvas"></canvas>
               </div>
-              <canvas id="expression-canvas"></canvas>
+              <!-- Lineage Proportions Tab Content -->
+              <div id="proportions-tab-content" class="tab-content">
+                <canvas id="proportions-canvas"></canvas>
+              </div>
               <div class="zoom-hint">Scroll to zoom, drag to pan</div>
             </div>
           </div>
@@ -311,6 +335,13 @@
               <div class="morphogen-slider-row"><label>M4</label><input type="range" id="morph-str-3" min="0" max="3" step="0.1" value="1"><span id="morph-val-3">1.0</span></div>
               <div class="morphogen-slider-row"><label>M5</label><input type="range" id="morph-str-4" min="0" max="3" step="0.1" value="1"><span id="morph-val-4">1.0</span></div>
               <div class="morphogen-slider-row"><label>M6</label><input type="range" id="morph-str-5" min="0" max="3" step="0.1" value="1"><span id="morph-val-5">1.0</span></div>
+            </div>
+            <div class="morphogen-uniform-option">
+              <label class="checkbox-label">
+                <input type="checkbox" id="uniform-morphogens">
+                <span>Uniform application</span>
+              </label>
+              <p class="option-hint">Apply to all cells equally (no spatial gradient)</p>
             </div>
           </div>
         </section>

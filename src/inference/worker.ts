@@ -35,6 +35,8 @@ export interface WorkerStartMessage {
     sigma: number;
     maxTime: number;  // Simulation time
     ensembleSize: number;  // Number of cells per evaluation
+    targetLineage: number;  // 0 = ensemble (all positions), 1-6 = specific lineage
+    uniformMorphogens: boolean;  // Apply morphogens uniformly to all cells
   };
   knockoutCandidates: number[];  // Gene indices that can be knocked out
 }
@@ -89,29 +91,88 @@ let targetState: TargetState | null = null;
 let maxGenerations = 200;
 let simMaxTime = 12;
 let ensembleSize = 5;
+let targetLineage = 0;  // 0 = ensemble (all positions), 1-6 = specific lineage
+let uniformMorphogens = true;  // Apply morphogens uniformly
 let isPaused = false;
 let shouldStop = false;
 
+// Phase flag for two-phase optimization
+let useVariancePenalty = false;
+
 /**
  * Evaluate fitness for a parameter vector
+ *
+ * Phase 1 (exploration): Simple average fitness - fast
+ * Phase 2 (fine-tuning): Adds variance penalty to avoid bimodal distributions
+ *
+ * Returns { fitness: number for optimization, rawFitness: number for display }
  */
-function evaluateFitness(paramVector: Float64Array): number {
+function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; rawFitness: number } {
   if (!engine || !encodingConfig || !targetState) {
     throw new Error('Worker not initialized');
   }
 
   const params = decode(paramVector, encodingConfig);
 
-  // Run ensemble simulation
-  const results = engine.runEnsemble(params, ensembleSize, simMaxTime);
+  // Run simulation - either for specific lineage or ensemble
+  let results: { expression: Float32Array; lineage: number }[];
+  if (targetLineage > 0) {
+    // Single cell at optimal position for target lineage
+    const result = engine.runForLineage(params, targetLineage, simMaxTime, uniformMorphogens);
+    results = [result];
+  } else {
+    // Ensemble across all positions
+    results = engine.runEnsemble(params, ensembleSize, simMaxTime, uniformMorphogens);
+  }
 
-  // Average fitness across ensemble
+  // Compute average fitness across results
   let totalFitness = 0;
   for (const result of results) {
     totalFitness += computeFitness(result, targetState);
   }
+  const meanFitness = totalFitness / results.length;
 
-  return totalFitness / results.length;
+  // Phase 1: Just return average fitness (fast exploration)
+  if (!useVariancePenalty) {
+    return { fitness: meanFitness, rawFitness: meanFitness };
+  }
+
+  // Phase 2: Add variance penalty to discourage bimodality
+  const nGenes = targetState.expression.length;
+  let variancePenalty = 0;
+  const varianceWeight = 0.3;
+
+  for (let g = 0; g < nGenes; g++) {
+    const weight = targetState.weights[g] ?? 0;
+    if (weight === 0) continue;
+
+    // Compute mean and variance for this gene across cells
+    let geneSum = 0;
+    for (const result of results) {
+      geneSum += result.expression[g] ?? 0;
+    }
+    const geneMean = geneSum / results.length;
+
+    let geneVariance = 0;
+    for (const result of results) {
+      const diff = (result.expression[g] ?? 0) - geneMean;
+      geneVariance += diff * diff;
+    }
+    geneVariance /= results.length;
+
+    variancePenalty += weight * geneVariance;
+  }
+
+  // Return both: penalized for optimization, raw for display
+  return {
+    fitness: meanFitness + varianceWeight * variancePenalty,
+    rawFitness: meanFitness
+  };
+}
+
+// Simple wrapper for optimization (returns penalized fitness)
+function evaluateFitness(paramVector: Float64Array): number {
+  return evaluateFitnessDetailed(paramVector).fitness;
 }
 
 /**
@@ -149,12 +210,21 @@ function computeCorrelation(paramVector: Float64Array): number {
 }
 
 /**
- * Main optimization loop
+ * Main optimization loop - Two phase approach
+ *
+ * Phase 1: Fast exploration using simple average fitness
+ * Phase 2: Fine-tuning with variance penalty to avoid bimodal solutions
  */
 async function runOptimization(): Promise<void> {
   if (!optimizer || !engine || !encodingConfig || !targetState) {
     throw new Error('Worker not initialized');
   }
+
+  // Phase 1: Main exploration (no variance penalty)
+  const finetuneGenerations = Math.min(50, Math.floor(maxGenerations * 0.2));
+  const explorationGenerations = maxGenerations - finetuneGenerations;
+
+  useVariancePenalty = false;
 
   for (let gen = 0; gen < maxGenerations; gen++) {
     // Check for stop signal
@@ -168,6 +238,13 @@ async function runOptimization(): Promise<void> {
     }
 
     if (shouldStop) break;
+
+    // Switch to Phase 2 (fine-tuning) after exploration
+    if (gen === explorationGenerations && !useVariancePenalty) {
+      useVariancePenalty = true;
+      // Re-evaluate current best with new fitness to reset optimizer state
+      optimizer.resetSigma(0.1);  // Reduce step size for fine-tuning
+    }
 
     // Sample population
     const population = optimizer.samplePopulation();
@@ -186,11 +263,14 @@ async function runOptimization(): Promise<void> {
     const meanFitness = fitnesses.reduce((a, b) => a + b, 0) / fitnesses.length;
     const correlation = computeCorrelation(best.params);
 
-    // Send progress update
+    // Get raw fitness (without variance penalty) for display
+    const { rawFitness } = evaluateFitnessDetailed(best.params);
+
+    // Send progress update (report raw fitness for comparability)
     const progressMsg: WorkerProgressMessage = {
       type: 'progress',
       generation: gen,
-      bestFitness: best.fitness,
+      bestFitness: rawFitness,  // Report raw fitness for display
       meanFitness,
       sigma: optimizer.getSigma(),
       bestParams: Array.from(best.params),
@@ -198,9 +278,11 @@ async function runOptimization(): Promise<void> {
     };
     self.postMessage(progressMsg);
 
-    // Check convergence
-    if (best.converged || best.fitness < 0.01) {
-      break;
+    // Check convergence (only in phase 1, always complete phase 2)
+    if (!useVariancePenalty && (best.converged || best.fitness < 0.01)) {
+      // Early convergence - skip to fine-tuning phase
+      useVariancePenalty = true;
+      optimizer.resetSigma(0.1);
     }
 
     // Yield to allow message processing
@@ -212,12 +294,13 @@ async function runOptimization(): Promise<void> {
   // Send final result
   const best = optimizer.getBest();
   const decodedParams = decode(best.params, encodingConfig);
+  const { rawFitness } = evaluateFitnessDetailed(best.params);
 
   const doneMsg: WorkerDoneMessage = {
     type: 'done',
     result: {
       params: Array.from(best.params),
-      fitness: best.fitness,
+      fitness: rawFitness,  // Report raw fitness for display
       generation: best.generation,
       converged: best.converged,
     },
@@ -256,6 +339,8 @@ self.onmessage = async (event: MessageEvent<WorkerInMessage>) => {
         maxGenerations = msg.config.maxGenerations;
         simMaxTime = msg.config.maxTime;
         ensembleSize = msg.config.ensembleSize;
+        targetLineage = msg.config.targetLineage;
+        uniformMorphogens = msg.config.uniformMorphogens;
 
         // Initialize optimizer
         const dims = getDimensions(encodingConfig);

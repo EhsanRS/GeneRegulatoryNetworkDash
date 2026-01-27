@@ -106,7 +106,7 @@ function initializeTargetSliders(): void {
       slider.type = 'range';
       slider.id = `target-${idx}`;
       slider.min = '0';
-      slider.max = '3';
+      slider.max = '6';
       slider.step = '0.1';
       slider.value = targetExpression[idx].toFixed(1);
 
@@ -514,7 +514,7 @@ function drawComparisonChart(): void {
   displayGenes.forEach((idx, i) => {
     const x = padding.left + (i / displayGenes.length) * plotW + barWidth * 0.5;
     const val = targetExpression[idx] ?? 0;
-    const barH = (val / 3) * plotH;
+    const barH = (val / 6) * plotH;
     ctx.fillRect(x, h - padding.bottom - barH, barWidth, barH);
   });
 
@@ -524,7 +524,7 @@ function drawComparisonChart(): void {
     displayGenes.forEach((idx, i) => {
       const x = padding.left + (i / displayGenes.length) * plotW + barWidth * 1.7;
       const val = bestSimulatedExpression![idx] ?? 0;
-      const barH = (val / 3) * plotH;
+      const barH = (val / 6) * plotH;
       ctx.fillRect(x, h - padding.bottom - barH, barWidth, barH);
     });
   }
@@ -552,7 +552,7 @@ function drawComparisonChart(): void {
   ctx.fillStyle = '#8b949e';
   ctx.textAlign = 'right';
   ctx.fillText('0', padding.left - 5, h - padding.bottom);
-  ctx.fillText('3', padding.left - 5, padding.top + 10);
+  ctx.fillText('6', padding.left - 5, padding.top + 10);
 }
 
 // Draw scatter plot (target vs simulated)
@@ -598,7 +598,7 @@ function drawScatterChart(): void {
   }
 
   // Draw points
-  const maxVal = 3;
+  const maxVal = 6;
   const displayGenes = [...geneGroups.tf_prog, ...geneGroups.tf_lin, ...geneGroups.ligand, ...geneGroups.receptor];
 
   for (const idx of displayGenes) {
@@ -636,11 +636,11 @@ function drawScatterChart(): void {
   // Axis values
   ctx.textAlign = 'center';
   ctx.fillText('0', padding.left, h - padding.bottom + 15);
-  ctx.fillText('3', w - padding.right, h - padding.bottom + 15);
+  ctx.fillText('6', w - padding.right, h - padding.bottom + 15);
 
   ctx.textAlign = 'right';
   ctx.fillText('0', padding.left - 5, h - padding.bottom);
-  ctx.fillText('3', padding.left - 5, padding.top + 10);
+  ctx.fillText('6', padding.left - 5, padding.top + 10);
 }
 
 // Update all charts
@@ -749,6 +749,8 @@ function startOptimization(): void {
   const maxGenerations = parseInt((document.getElementById('max-generations') as HTMLInputElement).value);
   const populationSize = parseInt((document.getElementById('pop-size') as HTMLInputElement).value);
   const simTime = parseInt((document.getElementById('sim-time') as HTMLInputElement).value);
+  const targetLineage = parseInt((document.getElementById('target-lineage') as HTMLSelectElement).value);
+  const uniformMorphogens = (document.getElementById('opt-uniform-morphogens') as HTMLInputElement).checked;
 
   // Update weights
   updateWeights();
@@ -799,7 +801,9 @@ function startOptimization(): void {
       populationSize,
       sigma: 0.3,
       maxTime: simTime,
-      ensembleSize: 5,
+      ensembleSize: 8,  // Sample cells at different spatial positions
+      targetLineage,  // 0 = all positions, 1-6 = specific lineage
+      uniformMorphogens,  // Apply morphogens to all cells equally
     },
     knockoutCandidates,
   };

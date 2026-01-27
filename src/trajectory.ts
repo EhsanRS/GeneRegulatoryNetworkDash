@@ -60,6 +60,9 @@ const morphogenEnabled = [true, true, true, true, true, true]; // One per lineag
 // Per-lineage morphogen strength multipliers (1.0 = normal, 2.0 = double strength, 0.5 = half)
 const morphogenStrengths = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]; // One per lineage (0-5)
 
+// Uniform morphogen application - if true, morphogens affect all cells equally (no spatial gradient)
+let uniformMorphogens = false;
+
 // Per-gene activity modifiers (1.0 = normal, 0 = fully inhibited, 2.0 = activated)
 // These modify the effective bias and incoming regulation for each gene
 const geneModifiers: Record<number, number> = {}; // geneIndex -> modifier (default 1.0)
@@ -213,7 +216,7 @@ let speed = 0.1;
 let noiseLevel = 0.1;
 let colorBy: 'lineage' | 'time' | 'gene' = 'lineage';
 let selectedGene = 0;
-let selectedGeneGroup: 'tf_prog' | 'tf_lin' | 'ligands' | 'receptors' | 'targets' | 'housekeeping' | 'other' = 'tf_prog';
+let selectedGeneGroup: 'tf_prog' | 'tf_lin' | 'ligands' | 'receptors' | 'targets' | 'housekeeping' | 'other' | 'custom' = 'tf_prog';
 
 let maxTime = 24; // hours (now mutable)
 const dt = 0.1; // simulation timestep
@@ -223,6 +226,20 @@ let cellCanvas: HTMLCanvasElement;
 let cellCtx: CanvasRenderingContext2D;
 let exprCanvas: HTMLCanvasElement;
 let exprCtx: CanvasRenderingContext2D;
+let proportionsCanvas: HTMLCanvasElement;
+let proportionsCtx: CanvasRenderingContext2D;
+
+// Dynamics panel state
+let activeDynamicsTab: 'expression' | 'proportions' = 'expression';
+const customSelectedGenes = new Set<number>();
+
+// Lineage proportion history
+interface ProportionSnapshot {
+  time: number;
+  counts: number[]; // Count per lineage (0-6, where 0 is undifferentiated)
+  total: number;
+}
+const proportionHistory: ProportionSnapshot[] = [];
 
 // Zoom and pan state for cell canvas
 let cellZoom = 1.0;
@@ -629,6 +646,7 @@ function resetSimulation(): void {
   cells = [];
   referenceCells = [];
   expressionHistory.length = 0;
+  proportionHistory.length = 0;
   stepAccumulator = 0;
   selectedCellId = null;
   selectedCellHistory.length = 0;
@@ -744,14 +762,18 @@ function simulationStep(): void {
       const sectorSize = (lineageSectorSizes[lin] ?? 1) / totalSize * 2 * Math.PI;
       const sectorCenter = sectorStart + sectorSize / 2;
 
-      // Distance from cell to this lineage's sector center (wrapped)
-      let angleDiff = Math.abs(cell.spatialAngle - sectorCenter);
-      if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+      // Spatial strength: 1.0 if uniform, otherwise Gaussian falloff from sector center
+      let spatialStrength = 1.0;
+      if (!uniformMorphogens) {
+        // Distance from cell to this lineage's sector center (wrapped)
+        let angleDiff = Math.abs(cell.spatialAngle - sectorCenter);
+        if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
 
-      // Morphogen strength falls off with angular distance
-      // Wider sectors have broader morphogen gradients
-      const width = sectorSize / 2;
-      const spatialStrength = Math.exp(-(angleDiff * angleDiff) / (width * width * 0.5));
+        // Morphogen strength falls off with angular distance
+        // Wider sectors have broader morphogen gradients
+        const width = sectorSize / 2;
+        spatialStrength = Math.exp(-(angleDiff * angleDiff) / (width * width * 0.5));
+      }
 
       // Time-dependent component - morphogen activates gradually
       const timeStrength = Math.min(1, time / params.morphogenTime);
@@ -814,7 +836,22 @@ function simulationStep(): void {
       return cells.reduce((s, c) => s + (c.expression[i] ?? 0), 0) / cells.length;
     });
 
+    // Also store raw means by gene index for custom mode
+    means.raw = geneNames.map((_, i) => {
+      return cells.reduce((s, c) => s + (c.expression[i] ?? 0), 0) / cells.length;
+    });
+
     expressionHistory.push({ time, means });
+
+    // Record lineage proportions
+    const counts = new Array(7).fill(0) as number[];
+    cells.forEach(cell => {
+      const current = counts[cell.lineage];
+      if (current !== undefined) {
+        counts[cell.lineage] = current + 1;
+      }
+    });
+    proportionHistory.push({ time, counts, total: cells.length });
   }
 
   // Simulate reference cells (with default parameters, no external signals)
@@ -833,11 +870,14 @@ function simulationStep(): void {
         const sectorSize = (lineageSectorSizes[lin] ?? 1) / totalSize * 2 * Math.PI;
         const sectorCenter = sectorStart + sectorSize / 2;
 
-        let angleDiff = Math.abs(cell.spatialAngle - sectorCenter);
-        if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
-
-        const width = sectorSize / 2;
-        const spatialStrength = Math.exp(-(angleDiff * angleDiff) / (width * width * 0.5));
+        // Spatial strength: 1.0 if uniform, otherwise Gaussian falloff from sector center
+        let spatialStrength = 1.0;
+        if (!uniformMorphogens) {
+          let angleDiff = Math.abs(cell.spatialAngle - sectorCenter);
+          if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+          const width = sectorSize / 2;
+          spatialStrength = Math.exp(-(angleDiff * angleDiff) / (width * width * 0.5));
+        }
         const timeStrength = Math.min(1, time / defaultParams.morphogenTime);
         const receptorGain = Math.min(1, receptorExpr / 0.5);
         const strength = spatialStrength * timeStrength * defaultParams.morphogenStrength * receptorGain;
@@ -1164,12 +1204,25 @@ function drawExpression(): void {
   // Auto-scale expression axis based on data
   let baseMaxExpr = 2;
   const key = getDataKey(selectedGeneGroup);
-  expressionHistory.forEach(h => {
-    const means = h.means[key];
-    if (means) {
-      means.forEach(v => { if (v > baseMaxExpr) baseMaxExpr = v; });
-    }
-  });
+  if (selectedGeneGroup === 'custom') {
+    // For custom mode, check raw data for selected genes
+    expressionHistory.forEach(h => {
+      const raw = h.means.raw;
+      if (raw) {
+        customSelectedGenes.forEach(geneIdx => {
+          const v = raw[geneIdx];
+          if (v !== undefined && v > baseMaxExpr) baseMaxExpr = v;
+        });
+      }
+    });
+  } else {
+    expressionHistory.forEach(h => {
+      const means = h.means[key];
+      if (means) {
+        means.forEach(v => { if (v > baseMaxExpr) baseMaxExpr = v; });
+      }
+    });
+  }
   baseMaxExpr = Math.ceil(baseMaxExpr * 1.1); // Add 10% headroom
 
   // Apply zoom to time and expression ranges
@@ -1246,23 +1299,37 @@ function drawExpression(): void {
       genesToPlot = geneGroups.other;
       geneLabels = genesToPlot.map(i => getGeneName(i));
       break;
+    case 'custom':
+      genesToPlot = Array.from(customSelectedGenes);
+      geneLabels = genesToPlot.map(i => getGeneName(i));
+      break;
     default:
       genesToPlot = geneGroups.tf_prog;
       geneLabels = genesToPlot.map(i => getGeneName(i));
   }
 
+  // For custom mode, we need to draw using raw expression data
+  const isCustomMode = selectedGeneGroup === 'custom';
+
   // Draw expression lines - no limit on gene count
   const dataKey = getDataKey(selectedGeneGroup);
-  genesToPlot.forEach((_, geneIdx) => {
+  genesToPlot.forEach((geneAbsIdx, plotIdx) => {
     exprCtx.beginPath();
-    exprCtx.strokeStyle = geneColors[geneIdx % geneColors.length] ?? '#8b949e';
+    exprCtx.strokeStyle = geneColors[plotIdx % geneColors.length] ?? '#8b949e';
     exprCtx.lineWidth = 1.5;
 
     let started = false;
     expressionHistory.forEach((h) => {
-      const means = h.means[dataKey];
-      if (!means) return;
-      const val = means[geneIdx];
+      let val: number | undefined;
+      if (isCustomMode) {
+        // For custom mode, use raw data with absolute gene index
+        const raw = h.means.raw;
+        val = raw?.[geneAbsIdx];
+      } else {
+        // For group mode, use group data with relative index
+        const means = h.means[dataKey];
+        val = means?.[plotIdx];
+      }
       if (val === undefined) return;
 
       // Use zoom-adjusted coordinate system
@@ -1300,6 +1367,141 @@ function drawExpression(): void {
     exprCtx.font = '8px sans-serif';
     exprCtx.textAlign = 'left';
     exprCtx.fillText(label.replace('TF_', '').replace('LIG_', 'L').replace('TARG_', 'T'), x + 10, y + 4);
+  });
+}
+
+function drawProportions(): void {
+  // Skip if panel is collapsed or tab is not active
+  const exprRow = document.getElementById('row-gene-expr');
+  if (exprRow?.classList.contains('collapsed')) return;
+  if (activeDynamicsTab !== 'proportions') return;
+
+  // Ensure canvas is properly sized
+  const dpr = window.devicePixelRatio || 1;
+  const rect = proportionsCanvas.getBoundingClientRect();
+  const canvasW = Math.floor(rect.width * dpr);
+  const canvasH = Math.floor(rect.height * dpr);
+
+  if (canvasW > 0 && canvasH > 0 && (proportionsCanvas.width !== canvasW || proportionsCanvas.height !== canvasH)) {
+    proportionsCanvas.width = canvasW;
+    proportionsCanvas.height = canvasH;
+  }
+
+  const width = proportionsCanvas.width / dpr;
+  const height = proportionsCanvas.height / dpr;
+  if (width <= 0 || height <= 0) return;
+
+  // Reset transform and clear entire canvas
+  proportionsCtx.setTransform(1, 0, 0, 1, 0, 0);
+  proportionsCtx.clearRect(0, 0, proportionsCanvas.width, proportionsCanvas.height);
+  proportionsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  proportionsCtx.fillStyle = '#0d1117';
+  proportionsCtx.fillRect(0, 0, width, height);
+
+  if (proportionHistory.length < 2) return;
+
+  const padding = { left: 50, right: 90, top: 20, bottom: 30 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+
+  // Draw axes
+  proportionsCtx.strokeStyle = '#30363d';
+  proportionsCtx.lineWidth = 1;
+  proportionsCtx.beginPath();
+  proportionsCtx.moveTo(padding.left, padding.top);
+  proportionsCtx.lineTo(padding.left, height - padding.bottom);
+  proportionsCtx.lineTo(width - padding.right, height - padding.bottom);
+  proportionsCtx.stroke();
+
+  // Axis labels
+  proportionsCtx.fillStyle = '#8b949e';
+  proportionsCtx.font = '10px sans-serif';
+  proportionsCtx.textAlign = 'center';
+  proportionsCtx.fillText('Time (hours)', (padding.left + width - padding.right) / 2, height - 5);
+
+  proportionsCtx.save();
+  proportionsCtx.translate(12, height / 2);
+  proportionsCtx.rotate(-Math.PI / 2);
+  proportionsCtx.fillText('Cell Count', 0, 0);
+  proportionsCtx.restore();
+
+  // Calculate time range (use zoom/pan from expr canvas)
+  const baseMaxT = Math.max(time, 1);
+  const timeRange = baseMaxT / exprZoom;
+  const timeCenterBase = baseMaxT / 2;
+  const minT = Math.max(0, timeCenterBase + exprPanX - timeRange / 2);
+  const maxT = minT + timeRange;
+
+  // Find max count for Y scale
+  let maxCount = 10;
+  proportionHistory.forEach(h => {
+    h.counts.forEach(c => { if (c > maxCount) maxCount = c; });
+  });
+  maxCount = Math.ceil(maxCount * 1.1);
+
+  // Time scale labels
+  const timeStep = Math.max(1, Math.ceil(timeRange / 6));
+  for (let t = Math.ceil(minT / timeStep) * timeStep; t <= maxT; t += timeStep) {
+    const x = padding.left + ((t - minT) / (maxT - minT)) * plotWidth;
+    if (x >= padding.left && x <= width - padding.right) {
+      proportionsCtx.fillStyle = '#8b949e';
+      proportionsCtx.textAlign = 'center';
+      proportionsCtx.fillText(String(Math.round(t)), x, height - padding.bottom + 15);
+    }
+  }
+
+  // Count scale labels
+  const countStep = Math.max(5, Math.ceil(maxCount / 5 / 5) * 5);
+  for (let c = 0; c <= maxCount; c += countStep) {
+    const y = height - padding.bottom - (c / maxCount) * plotHeight;
+    proportionsCtx.fillStyle = '#8b949e';
+    proportionsCtx.textAlign = 'right';
+    proportionsCtx.fillText(String(c), padding.left - 5, y + 3);
+  }
+
+  // Draw lines for each lineage with clear colors and thick lines
+  const nLineages = 7; // 0 = undiff + 6 lineages
+
+  for (let lin = 0; lin < nLineages; lin++) {
+    proportionsCtx.beginPath();
+    proportionsCtx.strokeStyle = getLineageColor(lin);
+    proportionsCtx.lineWidth = 2.5;
+    proportionsCtx.lineCap = 'round';
+    proportionsCtx.lineJoin = 'round';
+
+    let started = false;
+
+    proportionHistory.forEach((h) => {
+      if (h.time < minT || h.time > maxT) return;
+
+      const x = padding.left + ((h.time - minT) / (maxT - minT)) * plotWidth;
+      const count = h.counts[lin] ?? 0;
+      const y = height - padding.bottom - (count / maxCount) * plotHeight;
+
+      if (!started) {
+        proportionsCtx.moveTo(x, y);
+        started = true;
+      } else {
+        proportionsCtx.lineTo(x, y);
+      }
+    });
+
+    proportionsCtx.stroke();
+  }
+
+  // Draw legend on the right with clear formatting
+  const legendX = width - padding.right + 8;
+  const legendY = padding.top + 5;
+
+  lineageNames.forEach((name, i) => {
+    const y = legendY + i * 16;
+    proportionsCtx.fillStyle = getLineageColor(i);
+    proportionsCtx.fillRect(legendX, y - 4, 10, 10);
+    proportionsCtx.fillStyle = '#e6edf3';
+    proportionsCtx.font = '9px sans-serif';
+    proportionsCtx.textAlign = 'left';
+    proportionsCtx.fillText(name, legendX + 14, y + 4);
   });
 }
 
@@ -1361,6 +1563,7 @@ function updateDisplay(): void {
   // Draw (no resize here - only on window resize/panel toggle)
   drawCells();
   drawExpression();
+  drawProportions();
   updateLineageBars();
 
   // Update selected cell details and expression chart
@@ -1402,6 +1605,17 @@ function resizeCanvases(): void {
       exprCanvas.width = exprW;
       exprCanvas.height = exprH;
       exprCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    // Also resize proportions canvas (same panel)
+    const propRect = proportionsCanvas.getBoundingClientRect();
+    const propW = Math.floor(propRect.width * dpr);
+    const propH = Math.floor(propRect.height * dpr);
+
+    if (propW > 0 && propH > 0 && (proportionsCanvas.width !== propW || proportionsCanvas.height !== propH)) {
+      proportionsCanvas.width = propW;
+      proportionsCanvas.height = propH;
+      proportionsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
   }
 
@@ -1480,6 +1694,86 @@ function stopSimulation(): void {
   const btn = document.getElementById('btn-play')!;
   btn.textContent = '▶ Play';
   btn.classList.remove('playing');
+}
+
+function setupCustomGeneSelector(): void {
+  const container = document.getElementById('custom-gene-checkboxes');
+  if (!container) return;
+
+  const groups = [
+    { name: 'Progenitor TFs', genes: geneGroups.tf_prog },
+    { name: 'Lineage TFs', genes: geneGroups.tf_lin },
+    { name: 'Ligands', genes: geneGroups.ligand },
+    { name: 'Receptors', genes: geneGroups.receptor },
+    { name: 'Targets', genes: geneGroups.target.slice(0, 10) },
+    { name: 'Housekeeping', genes: geneGroups.housekeeping.slice(0, 5) },
+  ];
+
+  container.replaceChildren();
+
+  groups.forEach(group => {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'gene-group';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'gene-group-title';
+    titleDiv.textContent = group.name;
+    groupDiv.appendChild(titleDiv);
+
+    const itemsDiv = document.createElement('div');
+    itemsDiv.className = 'gene-items';
+
+    group.genes.forEach(geneIdx => {
+      const name = (geneNames[geneIdx] ?? '').replace('TF_PROG_', 'P').replace('TF_LIN_', 'L').replace('LIG_', '').replace('REC_', 'R').replace('TARG_', 'T').replace('HK_', 'H');
+
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.dataset.gene = String(geneIdx);
+      checkbox.checked = customSelectedGenes.has(geneIdx);
+
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          customSelectedGenes.add(geneIdx);
+        } else {
+          customSelectedGenes.delete(geneIdx);
+        }
+        updateDisplay();
+      });
+
+      const span = document.createElement('span');
+      span.textContent = name;
+
+      label.appendChild(checkbox);
+      label.appendChild(span);
+      itemsDiv.appendChild(label);
+    });
+
+    groupDiv.appendChild(itemsDiv);
+    container.appendChild(groupDiv);
+  });
+
+  // Clear button
+  document.getElementById('btn-clear-custom-genes')?.addEventListener('click', () => {
+    customSelectedGenes.clear();
+    container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      (cb as HTMLInputElement).checked = false;
+    });
+    updateDisplay();
+  });
+
+  // All TFs button
+  document.getElementById('btn-select-all-tfs')?.addEventListener('click', () => {
+    geneGroups.tf_prog.forEach(i => customSelectedGenes.add(i));
+    geneGroups.tf_lin.forEach(i => customSelectedGenes.add(i));
+    container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      const geneIdx = parseInt((cb as HTMLInputElement).dataset.gene ?? '-1', 10);
+      if (geneGroups.tf_prog.includes(geneIdx) || geneGroups.tf_lin.includes(geneIdx)) {
+        (cb as HTMLInputElement).checked = true;
+      }
+    });
+    updateDisplay();
+  });
 }
 
 function setupLegend(): void {
@@ -2609,6 +2903,8 @@ function init(): void {
   cellCtx = cellCanvas.getContext('2d')!;
   exprCanvas = document.getElementById('expression-canvas') as HTMLCanvasElement;
   exprCtx = exprCanvas.getContext('2d')!;
+  proportionsCanvas = document.getElementById('proportions-canvas') as HTMLCanvasElement;
+  proportionsCtx = proportionsCanvas.getContext('2d')!;
 
   // Setup controls
   const nCellsSlider = document.getElementById('n-cells') as HTMLInputElement;
@@ -2665,9 +2961,37 @@ function init(): void {
       document.querySelectorAll('.gene-btn').forEach(b => b.classList.remove('active'));
       (e.target as HTMLElement).classList.add('active');
       selectedGeneGroup = (e.target as HTMLElement).dataset.genes as typeof selectedGeneGroup;
+
+      // Show/hide custom gene selector
+      const customSelector = document.getElementById('custom-gene-selector');
+      if (customSelector) {
+        if (selectedGeneGroup === 'custom') {
+          customSelector.classList.remove('hidden');
+        } else {
+          customSelector.classList.add('hidden');
+        }
+      }
       updateDisplay();
     });
   });
+
+  // Dynamics tab switching
+  document.querySelectorAll('.dynamics-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('.dynamics-tab').forEach(t => t.classList.remove('active'));
+      (e.target as HTMLElement).classList.add('active');
+      activeDynamicsTab = (e.target as HTMLElement).dataset.tab as 'expression' | 'proportions';
+
+      // Show/hide tab content
+      document.getElementById('expression-tab-content')?.classList.toggle('active', activeDynamicsTab === 'expression');
+      document.getElementById('proportions-tab-content')?.classList.toggle('active', activeDynamicsTab === 'proportions');
+
+      updateDisplay();
+    });
+  });
+
+  // Setup custom gene selector
+  setupCustomGeneSelector();
 
   // Setup
   setupLegend();
@@ -2706,6 +3030,14 @@ function init(): void {
     showRefCheckbox.addEventListener('change', () => {
       showReference = showRefCheckbox.checked;
       updateDisplay();
+    });
+  }
+
+  // Uniform morphogens toggle
+  const uniformMorphogensCheckbox = document.getElementById('uniform-morphogens') as HTMLInputElement;
+  if (uniformMorphogensCheckbox) {
+    uniformMorphogensCheckbox.addEventListener('change', () => {
+      uniformMorphogens = uniformMorphogensCheckbox.checked;
     });
   }
 

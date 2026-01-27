@@ -476,6 +476,166 @@ button.primary.playing {
   border-color: var(--accent-blue);
 }
 
+/* Dynamics tabs */
+.dynamics-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 1rem;
+}
+
+.dynamics-tab {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.7rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dynamics-tab:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.dynamics-tab.active {
+  background: var(--accent-purple);
+  color: var(--bg-primary);
+  border-color: var(--accent-purple);
+}
+
+/* Tab content */
+.tab-content {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+/* Expression controls */
+.expression-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Custom gene selector */
+.custom-gene-selector {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.custom-gene-selector.hidden {
+  display: none;
+}
+
+.custom-gene-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.custom-gene-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.custom-gene-actions button {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.custom-gene-actions button:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.custom-gene-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.custom-gene-checkboxes .gene-group {
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
+.custom-gene-checkboxes .gene-group-title {
+  font-size: 0.65rem;
+  color: var(--accent-blue);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.custom-gene-checkboxes .gene-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.custom-gene-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.65rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+
+.custom-gene-checkboxes label:hover {
+  background: var(--bg-primary);
+  border-color: var(--accent-blue);
+}
+
+.custom-gene-checkboxes label:has(input:checked) {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: var(--bg-primary);
+}
+
+.custom-gene-checkboxes input[type="checkbox"] {
+  display: none;
+}
+
+/* Proportions tab content */
+#proportions-tab-content {
+  padding-top: 0.5rem;
+}
+
+/* Proportions canvas */
+#proportions-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+  border-radius: 4px;
+  background: var(--bg-primary);
+  display: block;
+}
+
 .expression-panel canvas {
   width: 100%;
   flex: 1;
@@ -961,6 +1121,30 @@ button.primary.playing {
   color: var(--text-primary);
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+.morphogen-uniform-option {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.morphogen-uniform-option .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.morphogen-uniform-option .checkbox-label input {
+  accent-color: var(--accent-green);
+}
+
+.morphogen-uniform-option .option-hint {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0 1.5rem;
 }
 
 /* Network edge controls */

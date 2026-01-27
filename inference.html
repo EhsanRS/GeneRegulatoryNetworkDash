@@ -159,6 +159,14 @@
             </label>
           </div>
 
+          <div class="config-group morphogen-sub-option">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-uniform-morphogens" checked>
+              <span>Uniform application</span>
+            </label>
+            <p class="config-hint">Apply morphogens to all cells equally (no spatial gradient)</p>
+          </div>
+
           <div class="config-group">
             <label>Max Generations: <span id="max-gen-val">200</span></label>
             <input type="range" id="max-generations" min="50" max="500" step="10" value="200">
@@ -172,6 +180,20 @@
           <div class="config-group">
             <label>Simulation Time: <span id="sim-time-val">12</span>h</label>
             <input type="range" id="sim-time" min="6" max="24" step="2" value="12">
+          </div>
+
+          <div class="config-group">
+            <label>Target Lineage:</label>
+            <select id="target-lineage">
+              <option value="0">All positions (ensemble)</option>
+              <option value="1">Lineage 1</option>
+              <option value="2">Lineage 2</option>
+              <option value="3">Lineage 3</option>
+              <option value="4">Lineage 4</option>
+              <option value="5">Lineage 5</option>
+              <option value="6">Lineage 6</option>
+            </select>
+            <p class="config-hint">Select a lineage to optimize for cells in that spatial region</p>
           </div>
 
           <div class="button-group">

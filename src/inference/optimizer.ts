@@ -405,6 +405,13 @@ export class CMAES {
   }
 
   /**
+   * Reset sigma to a new value (for fine-tuning phase)
+   */
+  resetSigma(newSigma: number): void {
+    this.sigma = newSigma;
+  }
+
+  /**
    * Get current generation
    */
   getGeneration(): number {

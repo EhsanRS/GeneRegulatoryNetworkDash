@@ -155,6 +155,7 @@ export class InferenceEngine {
     params: SimulationParams,
     spatialAngle: number = Math.PI,  // Default: middle of tissue
     maxTime: number = 12,
+    uniformMorphogens: boolean = false,  // If true, morphogens affect all cells equally
     dt: number = 0.1,
     noiseLevel: number = 0.01
   ): CellState {
@@ -229,11 +230,14 @@ export class InferenceEngine {
         const sectorSize = (lineageSectorSizes[lin] ?? 1) / totalSize * 2 * Math.PI;
         const sectorCenter = sectorStart + sectorSize / 2;
 
-        let angleDiff = Math.abs(spatialAngle - sectorCenter);
-        if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
-
-        const width = sectorSize / 2;
-        const spatialStrength = Math.exp(-(angleDiff * angleDiff) / (width * width * 0.5));
+        // Spatial strength: 1.0 if uniform, otherwise Gaussian falloff from sector center
+        let spatialStrength = 1.0;
+        if (!uniformMorphogens) {
+          let angleDiff = Math.abs(spatialAngle - sectorCenter);
+          if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+          const width = sectorSize / 2;
+          spatialStrength = Math.exp(-(angleDiff * angleDiff) / (width * width * 0.5));
+        }
         const timeStrength = Math.min(1, time / g.morphogenTime);
         const receptorGain = Math.min(1, receptorExpr / 0.5);
         const strength = spatialStrength * timeStrength * g.morphogenStrength * receptorGain * m.strength;
@@ -311,13 +315,14 @@ export class InferenceEngine {
   runEnsemble(
     params: SimulationParams,
     nSamples: number = 10,
-    maxTime: number = 12
+    maxTime: number = 12,
+    uniformMorphogens: boolean = false
   ): CellState[] {
     const results: CellState[] = [];
 
     for (let i = 0; i < nSamples; i++) {
       const angle = (i / nSamples) * 2 * Math.PI;
-      const state = this.runSimulation(params, angle, maxTime);
+      const state = this.runSimulation(params, angle, maxTime, uniformMorphogens);
       results.push(state);
     }
 
@@ -331,7 +336,8 @@ export class InferenceEngine {
   runForLineage(
     params: SimulationParams,
     targetLineage: number,
-    maxTime: number = 12
+    maxTime: number = 12,
+    uniformMorphogens: boolean = false
   ): CellState {
     // Calculate ideal angle for target lineage
     const lineageSectorSizes = [1.5, 0.8, 1.2, 0.6, 1.0, 0.9];
@@ -343,6 +349,6 @@ export class InferenceEngine {
     const sectorSize = (lineageSectorSizes[targetLineage - 1] ?? 1) / totalSize * 2 * Math.PI;
     const idealAngle = cumAngle + sectorSize / 2;
 
-    return this.runSimulation(params, idealAngle, maxTime);
+    return this.runSimulation(params, idealAngle, maxTime, uniformMorphogens);
   }
 }
