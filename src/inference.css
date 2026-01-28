@@ -673,6 +673,40 @@ button.primary.running {
   border: 1px solid var(--accent-purple);
 }
 
+/* Gene modifiers results */
+.result-modifiers {
+  font-size: 0.8rem;
+}
+
+.result-modifiers .modifier-item {
+  display: inline-block;
+  background: var(--bg-secondary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin: 0.25rem 0.25rem 0.25rem 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.result-modifiers .modifier-item.inhibited {
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+  background: rgba(248, 81, 73, 0.1);
+}
+
+.result-modifiers .modifier-item.overexpressed {
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+  background: rgba(63, 185, 80, 0.1);
+}
+
+.modifier-hint {
+  font-size: 0.65rem !important;
+  color: var(--text-muted) !important;
+  margin-bottom: 0.5rem;
+}
+
 .placeholder {
   color: var(--text-secondary);
   font-style: italic;

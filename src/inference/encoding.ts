@@ -30,6 +30,7 @@ export interface SimulationParams {
   global: GlobalParams;
   knockouts: Set<number>;  // Gene indices to knock out
   morphogens: MorphogenPerLineage[];  // Per-lineage morphogen settings
+  geneModifiers: Map<number, number>;  // Gene index -> modifier (0=inhibited, 1=normal, 2=overexpressed)
 }
 
 export interface ParameterBounds {
@@ -62,8 +63,10 @@ export interface EncodingConfig {
   includeGlobal: boolean;
   includeKnockouts: boolean;
   includeMorphogens: boolean;
+  includeModifiers: boolean;  // Include gene modifiers (overexpression/inhibition)
   geneNames: string[];  // All gene names for knockout encoding
   knockoutGeneIndices?: number[];  // Specific genes to consider for knockouts (TFs, ligands, receptors)
+  modifierGeneIndices?: number[];  // Specific genes to consider for modifiers
 }
 
 /**
@@ -82,6 +85,10 @@ export function getDimensions(config: EncodingConfig): number {
 
   if (config.includeMorphogens) {
     dims += NUM_LINEAGES;  // One strength value per lineage
+  }
+
+  if (config.includeModifiers && config.modifierGeneIndices) {
+    dims += config.modifierGeneIndices.length;  // Continuous [0, 2] per gene
   }
 
   return dims;
@@ -110,6 +117,13 @@ export function getBounds(config: EncodingConfig): [number, number][] {
   if (config.includeMorphogens) {
     for (let i = 0; i < NUM_LINEAGES; i++) {
       bounds.push([0, 2]);  // Morphogen strength
+    }
+  }
+
+  if (config.includeModifiers && config.modifierGeneIndices) {
+    // Gene modifiers: 0 = fully inhibited, 1 = normal, 2 = overexpressed
+    for (let i = 0; i < config.modifierGeneIndices.length; i++) {
+      bounds.push([0, 2]);
     }
   }
 
@@ -145,6 +159,13 @@ export function getDefaultVector(config: EncodingConfig): Float64Array {
     }
   }
 
+  if (config.includeModifiers && config.modifierGeneIndices) {
+    // Default: normal activity (modifier = 1.0 -> normalized = 0.5)
+    for (let i = 0; i < config.modifierGeneIndices.length; i++) {
+      vector[idx++] = 0.5;  // 0.5 * 2 = 1.0 (normal activity)
+    }
+  }
+
   return vector;
 }
 
@@ -177,6 +198,14 @@ export function encode(params: SimulationParams, config: EncodingConfig): Float6
       const m = params.morphogens[i];
       // Normalize strength [0, 2] to [0, 1]
       vector[idx++] = m ? m.strength / 2 : 0.5;
+    }
+  }
+
+  if (config.includeModifiers && config.modifierGeneIndices) {
+    for (const geneIdx of config.modifierGeneIndices) {
+      // Normalize modifier [0, 2] to [0, 1]
+      const modifier = params.geneModifiers.get(geneIdx) ?? 1.0;
+      vector[idx++] = modifier / 2;
     }
   }
 
@@ -234,7 +263,20 @@ export function decode(vector: Float64Array, config: EncodingConfig): Simulation
     }
   }
 
-  return { global, knockouts, morphogens };
+  // Gene modifiers
+  const geneModifiers = new Map<number, number>();
+  if (config.includeModifiers && config.modifierGeneIndices) {
+    for (const geneIdx of config.modifierGeneIndices) {
+      const normalized = Math.max(0, Math.min(1, vector[idx++]));
+      const modifier = normalized * 2;  // [0, 2] range
+      // Only store non-default modifiers (not exactly 1.0)
+      if (Math.abs(modifier - 1.0) > 0.05) {
+        geneModifiers.set(geneIdx, modifier);
+      }
+    }
+  }
+
+  return { global, knockouts, morphogens, geneModifiers };
 }
 
 /**
@@ -258,6 +300,12 @@ export function getParameterNames(config: EncodingConfig): string[] {
   if (config.includeMorphogens) {
     for (let i = 0; i < NUM_LINEAGES; i++) {
       names.push(`Morphogen_Lin${i + 1}`);
+    }
+  }
+
+  if (config.includeModifiers && config.modifierGeneIndices) {
+    for (const geneIdx of config.modifierGeneIndices) {
+      names.push(`Mod_${config.geneNames[geneIdx] ?? `Gene${geneIdx}`}`);
     }
   }
 
@@ -293,6 +341,16 @@ export function formatParams(params: SimulationParams, config: EncodingConfig): 
     }
   }
 
+  if (config.includeModifiers) {
+    const modifiers: string[] = [];
+    for (const [geneIdx, modifier] of params.geneModifiers) {
+      const geneName = config.geneNames[geneIdx] ?? `Gene${geneIdx}`;
+      const label = modifier < 0.5 ? 'Inhibited' : modifier > 1.5 ? 'Overexpr' : 'Mod';
+      modifiers.push(`${geneName}: ${modifier.toFixed(2)}`);
+    }
+    result['Gene Modifiers'] = modifiers.length > 0 ? modifiers.join(', ') : 'None';
+  }
+
   return result;
 }
 
@@ -304,6 +362,7 @@ export function exportParamsJSON(params: SimulationParams): string {
     global: params.global,
     knockouts: Array.from(params.knockouts),
     morphogens: params.morphogens,
+    geneModifiers: Array.from(params.geneModifiers.entries()),
   }, null, 2);
 }
 
@@ -316,6 +375,7 @@ export function importParamsJSON(json: string): SimulationParams {
     global: data.global,
     knockouts: new Set(data.knockouts),
     morphogens: data.morphogens,
+    geneModifiers: new Map(data.geneModifiers ?? []),
   };
 }
 
@@ -327,6 +387,7 @@ export function encodeParamsURL(params: SimulationParams): string {
     g: params.global,
     k: Array.from(params.knockouts),
     m: params.morphogens,
+    mod: Array.from(params.geneModifiers.entries()),
   });
   // Use btoa for base64 encoding
   return btoa(json);
@@ -343,6 +404,7 @@ export function decodeParamsURL(encoded: string): SimulationParams {
       global: data.g,
       knockouts: new Set(data.k),
       morphogens: data.m,
+      geneModifiers: new Map(data.mod ?? []),
     };
   } catch {
     throw new Error('Invalid parameter encoding');

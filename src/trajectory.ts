@@ -2818,6 +2818,20 @@ function applyURLParams(): void {
       });
     }
 
+    // Apply gene modifiers (from inference optimization)
+    if (data.mod && Array.isArray(data.mod)) {
+      // Clear existing modifiers
+      Object.keys(geneModifiers).forEach(key => {
+        delete geneModifiers[parseInt(key, 10)];
+      });
+      // Apply new modifiers - data.mod is array of [geneIdx, modifier] tuples
+      data.mod.forEach(([geneIdx, modifier]: [number, number]) => {
+        if (typeof geneIdx === 'number' && typeof modifier === 'number') {
+          geneModifiers[geneIdx] = modifier;
+        }
+      });
+    }
+
     // Update UI sliders to reflect imported params
     updateAdvancedSlidersFromParams();
 
@@ -2826,6 +2840,9 @@ function applyURLParams(): void {
 
     // Update morphogen UI
     updateMorphogenUI();
+
+    // Update gene modifier UI
+    updateModifierUI();
 
     console.log('Applied parameters from inference page');
   } catch (e) {
@@ -2865,6 +2882,22 @@ function updateMorphogenUI(): void {
       valSpan.textContent = morphogenStrengths[i].toFixed(1);
     }
   }
+}
+
+// Update gene modifier sliders from state
+function updateModifierUI(): void {
+  document.querySelectorAll('.modifier-row input[type="range"]').forEach(slider => {
+    const inp = slider as HTMLInputElement;
+    const geneIdx = parseInt(inp.dataset.gene ?? '-1', 10);
+    if (geneIdx >= 0) {
+      const modifier = geneModifiers[geneIdx] ?? 1.0;
+      inp.value = modifier.toString();
+      const valueSpan = inp.parentElement?.querySelector('span');
+      if (valueSpan) {
+        valueSpan.textContent = modifier.toFixed(1);
+      }
+    }
+  });
 }
 
 // Update advanced sliders from current params

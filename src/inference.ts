@@ -655,6 +655,7 @@ function updateResults(): void {
   const paramsDiv = document.getElementById('result-params');
   const knockoutsDiv = document.getElementById('result-knockouts');
   const morphogensDiv = document.getElementById('result-morphogens');
+  const modifiersDiv = document.getElementById('result-modifiers');
 
   // Helper to clear element
   function clearElement(el: HTMLElement | null): void {
@@ -677,9 +678,11 @@ function updateResults(): void {
     clearElement(paramsDiv);
     clearElement(knockoutsDiv);
     clearElement(morphogensDiv);
+    clearElement(modifiersDiv);
     addPlaceholder(paramsDiv, 'Run optimization to see results');
     addPlaceholder(knockoutsDiv, '-');
     addPlaceholder(morphogensDiv, '-');
+    addPlaceholder(modifiersDiv, '-');
     return;
   }
 
@@ -733,6 +736,35 @@ function updateResults(): void {
     });
   }
 
+  // Gene Modifiers
+  if (modifiersDiv) {
+    clearElement(modifiersDiv);
+    if (bestParams.geneModifiers.size === 0) {
+      addPlaceholder(modifiersDiv, 'None');
+    } else {
+      // Sort modifiers by effect (inhibited first, then overexpressed)
+      const sortedModifiers = Array.from(bestParams.geneModifiers.entries())
+        .sort((a, b) => a[1] - b[1]);
+
+      for (const [idx, modifier] of sortedModifiers) {
+        const item = document.createElement('span');
+        // Color-code by effect type
+        if (modifier < 0.5) {
+          item.className = 'modifier-item inhibited';
+        } else if (modifier > 1.5) {
+          item.className = 'modifier-item overexpressed';
+        } else {
+          item.className = 'modifier-item';
+        }
+        const geneName = geneNames[idx] ?? `Gene_${idx}`;
+        const shortName = geneName.replace('TF_PROG_', 'P').replace('TF_LIN', 'L').replace('LIG_', 'Lig').replace('REC_', 'Rec');
+        item.textContent = `${shortName}: ${modifier.toFixed(2)}`;
+        item.title = geneName;
+        modifiersDiv.appendChild(item);
+      }
+    }
+  }
+
   // Enable action buttons
   (document.getElementById('btn-apply') as HTMLButtonElement).disabled = false;
   (document.getElementById('btn-export') as HTMLButtonElement).disabled = false;
@@ -746,6 +778,7 @@ function startOptimization(): void {
   const includeGlobal = (document.getElementById('opt-global') as HTMLInputElement).checked;
   const includeKnockouts = (document.getElementById('opt-knockouts') as HTMLInputElement).checked;
   const includeMorphogens = (document.getElementById('opt-morphogens') as HTMLInputElement).checked;
+  const includeModifiers = (document.getElementById('opt-modifiers') as HTMLInputElement).checked;
   const maxGenerations = parseInt((document.getElementById('max-generations') as HTMLInputElement).value);
   const populationSize = parseInt((document.getElementById('pop-size') as HTMLInputElement).value);
   const simTime = parseInt((document.getElementById('sim-time') as HTMLInputElement).value);
@@ -797,6 +830,7 @@ function startOptimization(): void {
       includeGlobal,
       includeKnockouts,
       includeMorphogens,
+      includeModifiers,
       maxGenerations,
       populationSize,
       sigma: 0.3,
@@ -806,6 +840,7 @@ function startOptimization(): void {
       uniformMorphogens,  // Apply morphogens to all cells equally
     },
     knockoutCandidates,
+    modifierCandidates: knockoutCandidates,  // Same genes can have modifiers (TFs, ligands, receptors)
   };
 
   worker.postMessage(startMsg);
@@ -838,13 +873,16 @@ function handleProgress(msg: WorkerProgressMessage): void {
   const includeGlobal = (document.getElementById('opt-global') as HTMLInputElement).checked;
   const includeKnockouts = (document.getElementById('opt-knockouts') as HTMLInputElement).checked;
   const includeMorphogens = (document.getElementById('opt-morphogens') as HTMLInputElement).checked;
+  const includeModifiers = (document.getElementById('opt-modifiers') as HTMLInputElement).checked;
 
   const config: EncodingConfig = {
     includeGlobal,
     includeKnockouts,
     includeMorphogens,
+    includeModifiers,
     geneNames,
     knockoutGeneIndices: knockoutCandidates,
+    modifierGeneIndices: knockoutCandidates,
   };
 
   // Decode and simulate to show expression

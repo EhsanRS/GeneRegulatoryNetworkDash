@@ -30,6 +30,7 @@ export interface WorkerStartMessage {
     includeGlobal: boolean;
     includeKnockouts: boolean;
     includeMorphogens: boolean;
+    includeModifiers: boolean;  // Include gene modifiers (overexpression/inhibition)
     maxGenerations: number;
     populationSize: number;
     sigma: number;
@@ -39,6 +40,7 @@ export interface WorkerStartMessage {
     uniformMorphogens: boolean;  // Apply morphogens uniformly to all cells
   };
   knockoutCandidates: number[];  // Gene indices that can be knocked out
+  modifierCandidates: number[];  // Gene indices that can have modifiers applied
 }
 
 export interface WorkerStopMessage {
@@ -332,8 +334,10 @@ self.onmessage = async (event: MessageEvent<WorkerInMessage>) => {
           includeGlobal: msg.config.includeGlobal,
           includeKnockouts: msg.config.includeKnockouts,
           includeMorphogens: msg.config.includeMorphogens,
+          includeModifiers: msg.config.includeModifiers,
           geneNames: engine.getGeneNames(),
           knockoutGeneIndices: msg.knockoutCandidates,
+          modifierGeneIndices: msg.modifierCandidates,
         };
 
         maxGenerations = msg.config.maxGenerations;

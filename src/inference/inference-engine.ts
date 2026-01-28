@@ -159,7 +159,7 @@ export class InferenceEngine {
     dt: number = 0.1,
     noiseLevel: number = 0.01
   ): CellState {
-    const { global: g, knockouts, morphogens } = params;
+    const { global: g, knockouts, morphogens, geneModifiers } = params;
 
     // Build weight matrix with current inhibition multiplier
     const W = new Float32Array(this.nGenes * this.nGenes);
@@ -259,6 +259,12 @@ export class InferenceEngine {
           input += (h[j] ?? 0) * (W[i * this.nGenes + j] ?? 0);
         }
         input += morphogen[i] ?? 0;
+
+        // Apply gene modifier (simulates inhibitors/activators)
+        // 0 = fully inhibited, 1 = normal, 2 = overexpressed
+        const modifier = geneModifiers?.get(i) ?? 1.0;
+        input *= modifier;
+
         f[i] = input - (decay[i] ?? 0) * (expression[i] ?? 0);
       }
 
