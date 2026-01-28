@@ -50,6 +50,8 @@ let comparisonCanvas: HTMLCanvasElement;
 let comparisonCtx: CanvasRenderingContext2D;
 let scatterCanvas: HTMLCanvasElement;
 let scatterCtx: CanvasRenderingContext2D;
+let errorCanvas: HTMLCanvasElement;
+let errorCtx: CanvasRenderingContext2D;
 
 // Weight preset modes
 let weightPreset: 'uniform' | 'tfs-only' | 'select' | 'custom' = 'select';
@@ -71,6 +73,10 @@ function initializeDefaultTarget(): void {
   // Housekeeping stable
   geneGroups.housekeeping.forEach(i => { targetExpression[i] = 1.0; });
   geneGroups.other.forEach(i => { targetExpression[i] = 0.1; });
+
+  // Pre-select all TFs (prog and lin) for weighting
+  geneGroups.tf_prog.forEach(i => { selectedGenes.add(i); });
+  geneGroups.tf_lin.forEach(i => { selectedGenes.add(i); });
 }
 
 // Initialize target expression sliders
@@ -369,10 +375,12 @@ function initializeCanvases(): void {
   fitnessCanvas = document.getElementById('fitness-chart') as HTMLCanvasElement;
   comparisonCanvas = document.getElementById('comparison-chart') as HTMLCanvasElement;
   scatterCanvas = document.getElementById('scatter-chart') as HTMLCanvasElement;
+  errorCanvas = document.getElementById('error-chart') as HTMLCanvasElement;
 
   if (fitnessCanvas) fitnessCtx = fitnessCanvas.getContext('2d')!;
   if (comparisonCanvas) comparisonCtx = comparisonCanvas.getContext('2d')!;
   if (scatterCanvas) scatterCtx = scatterCanvas.getContext('2d')!;
+  if (errorCanvas) errorCtx = errorCanvas.getContext('2d')!;
 
   // Handle resize
   window.addEventListener('resize', resizeCanvases);
@@ -380,13 +388,22 @@ function initializeCanvases(): void {
 }
 
 function resizeCanvases(): void {
-  const canvases = [fitnessCanvas, comparisonCanvas, scatterCanvas];
+  const canvases = [fitnessCanvas, comparisonCanvas, scatterCanvas, errorCanvas];
   for (const canvas of canvases) {
     if (!canvas) continue;
     const rect = canvas.parentElement?.getBoundingClientRect();
-    if (rect) {
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+    if (rect && rect.width > 0 && rect.height > 0) {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Reset transform before applying new scale
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+      }
     }
   }
   updateCharts();
@@ -397,18 +414,19 @@ function drawFitnessChart(): void {
   if (!fitnessCtx || !fitnessCanvas) return;
 
   const ctx = fitnessCtx;
-  const w = fitnessCanvas.width;
-  const h = fitnessCanvas.height;
+  const dpr = window.devicePixelRatio || 1;
+  const w = fitnessCanvas.width / dpr;
+  const h = fitnessCanvas.height / dpr;
 
   // Clear
   ctx.fillStyle = '#161b22';
   ctx.fillRect(0, 0, w, h);
 
   if (fitnessHistory.length === 0) {
-    ctx.fillStyle = '#8b949e';
-    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#6e7681';
+    ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('No data yet', w / 2, h / 2);
+    ctx.fillText('Waiting for optimization...', w / 2, h / 2);
     return;
   }
 
@@ -489,158 +507,435 @@ function drawFitnessChart(): void {
   }
 }
 
-// Draw expression comparison chart
+// Gene type colors
+const geneColors = {
+  tf_prog: '#f85149',
+  tf_lin: '#58a6ff',
+  ligand: '#3fb950',
+  receptor: '#a371f7',
+  target: '#ffa657',
+  housekeeping: '#8b949e',
+  other: '#6e7681',
+};
+
+// Draw expression comparison chart - grouped by gene type
 function drawComparisonChart(): void {
   if (!comparisonCtx || !comparisonCanvas) return;
 
   const ctx = comparisonCtx;
-  const w = comparisonCanvas.width;
-  const h = comparisonCanvas.height;
+  const dpr = window.devicePixelRatio || 1;
+  const w = comparisonCanvas.width / dpr;
+  const h = comparisonCanvas.height / dpr;
 
   // Clear
   ctx.fillStyle = '#161b22';
   ctx.fillRect(0, 0, w, h);
 
-  const padding = { top: 20, right: 20, bottom: 40, left: 40 };
+  const padding = { top: 25, right: 15, bottom: 45, left: 45 };
   const plotW = w - padding.left - padding.right;
   const plotH = h - padding.top - padding.bottom;
 
-  // Show TF genes only for clarity
-  const displayGenes = [...geneGroups.tf_prog, ...geneGroups.tf_lin];
-  const barWidth = plotW / displayGenes.length / 2.5;
+  // Gene groups to display with their info
+  const groups = [
+    { key: 'tf_prog', label: 'Prog TFs', indices: geneGroups.tf_prog, color: geneColors.tf_prog },
+    { key: 'tf_lin', label: 'Lin TFs', indices: geneGroups.tf_lin, color: geneColors.tf_lin },
+    { key: 'ligand', label: 'Ligands', indices: geneGroups.ligand, color: geneColors.ligand },
+    { key: 'receptor', label: 'Receptors', indices: geneGroups.receptor, color: geneColors.receptor },
+  ];
 
-  // Draw target bars
-  ctx.fillStyle = '#a371f7';
-  displayGenes.forEach((idx, i) => {
-    const x = padding.left + (i / displayGenes.length) * plotW + barWidth * 0.5;
-    const val = targetExpression[idx] ?? 0;
-    const barH = (val / 6) * plotH;
-    ctx.fillRect(x, h - padding.bottom - barH, barWidth, barH);
-  });
+  const totalGenes = groups.reduce((sum, g) => sum + g.indices.length, 0);
+  const groupGap = 15;
+  const totalGaps = (groups.length - 1) * groupGap;
+  const barAreaWidth = plotW - totalGaps;
+  const barWidth = Math.min(8, barAreaWidth / totalGenes / 2.2);
+  const pairWidth = barWidth * 2.4;
 
-  // Draw simulated bars (if available)
-  if (bestSimulatedExpression) {
-    ctx.fillStyle = '#3fb950';
-    displayGenes.forEach((idx, i) => {
-      const x = padding.left + (i / displayGenes.length) * plotW + barWidth * 1.7;
-      const val = bestSimulatedExpression![idx] ?? 0;
-      const barH = (val / 6) * plotH;
-      ctx.fillRect(x, h - padding.bottom - barH, barWidth, barH);
-    });
+  // Draw grid lines
+  ctx.strokeStyle = '#21262d';
+  ctx.lineWidth = 1;
+  for (let v = 0; v <= 6; v += 2) {
+    const y = padding.top + plotH - (v / 6) * plotH;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(w - padding.right, y);
+    ctx.stroke();
   }
 
-  // X-axis labels
+  // Draw Y-axis labels
   ctx.fillStyle = '#8b949e';
-  ctx.font = '9px sans-serif';
-  ctx.textAlign = 'center';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'right';
+  for (let v = 0; v <= 6; v += 2) {
+    const y = padding.top + plotH - (v / 6) * plotH;
+    ctx.fillText(String(v), padding.left - 5, y + 3);
+  }
 
-  // Only label every few genes to avoid clutter
-  const labelInterval = Math.max(1, Math.floor(displayGenes.length / 12));
-  displayGenes.forEach((idx, i) => {
-    if (i % labelInterval !== 0) return;
-    const x = padding.left + (i / displayGenes.length) * plotW + barWidth * 1.1;
-    const name = geneNames[idx]?.replace('TF_PROG_', 'P').replace('TF_LIN', 'L') ?? '';
-    ctx.save();
-    ctx.translate(x, h - padding.bottom + 5);
-    ctx.rotate(Math.PI / 4);
-    ctx.textAlign = 'left';
-    ctx.fillText(name, 0, 0);
-    ctx.restore();
+  // Y-axis title
+  ctx.save();
+  ctx.translate(12, padding.top + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('Expression Level', 0, 0);
+  ctx.restore();
+
+  let xOffset = padding.left;
+
+  groups.forEach((group, gi) => {
+    const groupWidth = group.indices.length * pairWidth;
+
+    // Draw group background
+    ctx.fillStyle = 'rgba(48, 54, 61, 0.3)';
+    ctx.fillRect(xOffset - 2, padding.top, groupWidth + 4, plotH);
+
+    // Draw group label
+    ctx.fillStyle = group.color;
+    ctx.font = 'bold 9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(group.label, xOffset + groupWidth / 2, h - padding.bottom + 30);
+
+    // Draw bars for each gene
+    group.indices.forEach((idx, i) => {
+      const x = xOffset + i * pairWidth;
+      const targetVal = targetExpression[idx] ?? 0;
+      const simVal = bestSimulatedExpression ? (bestSimulatedExpression[idx] ?? 0) : 0;
+      const isWeighted = targetWeights[idx] > 0;
+
+      // Target bar (left, purple-ish)
+      const targetH = (targetVal / 6) * plotH;
+      ctx.fillStyle = isWeighted ? '#a371f7' : 'rgba(163, 113, 247, 0.3)';
+      ctx.fillRect(x, padding.top + plotH - targetH, barWidth, targetH);
+
+      // Simulated bar (right, green-ish)
+      if (bestSimulatedExpression) {
+        const simH = (simVal / 6) * plotH;
+        ctx.fillStyle = isWeighted ? '#3fb950' : 'rgba(63, 185, 80, 0.3)';
+        ctx.fillRect(x + barWidth * 1.2, padding.top + plotH - simH, barWidth, simH);
+      }
+
+      // Draw gene label for every Nth gene
+      const labelInterval = Math.max(1, Math.floor(group.indices.length / 4));
+      if (i % labelInterval === 0) {
+        const name = geneNames[idx]?.replace('TF_PROG_', 'P').replace('TF_LIN', 'L').replace('LIG_', '').replace('REC_', '') ?? '';
+        ctx.fillStyle = '#6e7681';
+        ctx.font = '8px sans-serif';
+        ctx.save();
+        ctx.translate(x + barWidth, padding.top + plotH + 5);
+        ctx.rotate(Math.PI / 3);
+        ctx.textAlign = 'left';
+        ctx.fillText(name, 0, 0);
+        ctx.restore();
+      }
+    });
+
+    xOffset += groupWidth + groupGap;
   });
 
-  // Y-axis
-  ctx.fillStyle = '#8b949e';
-  ctx.textAlign = 'right';
-  ctx.fillText('0', padding.left - 5, h - padding.bottom);
-  ctx.fillText('6', padding.left - 5, padding.top + 10);
+  // Draw axes
+  ctx.strokeStyle = '#30363d';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding.left, padding.top);
+  ctx.lineTo(padding.left, padding.top + plotH);
+  ctx.lineTo(w - padding.right, padding.top + plotH);
+  ctx.stroke();
 }
 
-// Draw scatter plot (target vs simulated)
+// Draw scatter plot (target vs simulated) with R² and better styling
 function drawScatterChart(): void {
   if (!scatterCtx || !scatterCanvas) return;
 
   const ctx = scatterCtx;
-  const w = scatterCanvas.width;
-  const h = scatterCanvas.height;
+  const dpr = window.devicePixelRatio || 1;
+  const w = scatterCanvas.width / dpr;
+  const h = scatterCanvas.height / dpr;
 
   // Clear
   ctx.fillStyle = '#161b22';
   ctx.fillRect(0, 0, w, h);
 
-  const padding = { top: 20, right: 20, bottom: 40, left: 50 };
+  const padding = { top: 20, right: 15, bottom: 35, left: 40 };
   const plotW = w - padding.left - padding.right;
   const plotH = h - padding.top - padding.bottom;
+  const maxVal = 6;
 
-  // Draw diagonal (perfect correlation line)
-  ctx.strokeStyle = '#30363d';
+  // Draw grid
+  ctx.strokeStyle = '#21262d';
   ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
+  for (let v = 0; v <= 6; v += 2) {
+    const pos = (v / maxVal);
+    // Horizontal
+    const y = padding.top + plotH * (1 - pos);
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(w - padding.right, y);
+    ctx.stroke();
+    // Vertical
+    const x = padding.left + plotW * pos;
+    ctx.beginPath();
+    ctx.moveTo(x, padding.top);
+    ctx.lineTo(x, padding.top + plotH);
+    ctx.stroke();
+  }
+
+  // Draw identity line (y = x, where target = simulated = perfect match)
+  // Use a subtle solid line, not dashed, so it's clearly a reference
+  ctx.strokeStyle = 'rgba(139, 148, 158, 0.3)';
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(padding.left, h - padding.bottom);
-  ctx.lineTo(w - padding.right, padding.top);
+  ctx.moveTo(padding.left, padding.top + plotH);
+  ctx.lineTo(padding.left + plotW, padding.top);
   ctx.stroke();
-  ctx.setLineDash([]);
+
+  // Label for the identity line (only when there's data)
+  if (bestSimulatedExpression) {
+    ctx.fillStyle = 'rgba(139, 148, 158, 0.5)';
+    ctx.font = '8px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.save();
+    ctx.translate(padding.left + plotW - 20, padding.top + 18);
+    ctx.rotate(-Math.PI / 4);
+    ctx.fillText('y=x', 0, 0);
+    ctx.restore();
+  }
 
   // Draw axes
   ctx.strokeStyle = '#30363d';
+  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(padding.left, padding.top);
-  ctx.lineTo(padding.left, h - padding.bottom);
-  ctx.lineTo(w - padding.right, h - padding.bottom);
+  ctx.lineTo(padding.left, padding.top + plotH);
+  ctx.lineTo(w - padding.right, padding.top + plotH);
   ctx.stroke();
 
+  // Axis labels
+  ctx.fillStyle = '#8b949e';
+  ctx.font = '9px sans-serif';
+  ctx.textAlign = 'center';
+  for (let v = 0; v <= 6; v += 2) {
+    const x = padding.left + (v / maxVal) * plotW;
+    ctx.fillText(String(v), x, h - padding.bottom + 12);
+  }
+  ctx.textAlign = 'right';
+  for (let v = 0; v <= 6; v += 2) {
+    const y = padding.top + plotH * (1 - v / maxVal);
+    ctx.fillText(String(v), padding.left - 5, y + 3);
+  }
+
+  // Axis titles
+  ctx.fillStyle = '#6e7681';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Target', padding.left + plotW / 2, h - 3);
+  ctx.save();
+  ctx.translate(10, padding.top + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Simulated', 0, 0);
+  ctx.restore();
+
   if (!bestSimulatedExpression) {
-    ctx.fillStyle = '#8b949e';
-    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#6e7681';
+    ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Run optimization to see results', w / 2, h / 2);
+    ctx.fillText('Waiting for optimization...', w / 2, h / 2);
     return;
   }
 
-  // Draw points
-  const maxVal = 6;
-  const displayGenes = [...geneGroups.tf_prog, ...geneGroups.tf_lin, ...geneGroups.ligand, ...geneGroups.receptor];
+  // Collect points data
+  const allGenes = [...geneGroups.tf_prog, ...geneGroups.tf_lin, ...geneGroups.ligand, ...geneGroups.receptor];
+  const points: { x: number; y: number; color: string; weighted: boolean; idx: number }[] = [];
 
-  for (const idx of displayGenes) {
+  for (const idx of allGenes) {
     const target = targetExpression[idx] ?? 0;
     const simulated = bestSimulatedExpression[idx] ?? 0;
+    const isWeighted = targetWeights[idx] > 0;
 
-    const x = padding.left + (target / maxVal) * plotW;
-    const y = h - padding.bottom - (simulated / maxVal) * plotH;
+    let color = geneColors.other;
+    if (geneGroups.tf_prog.includes(idx)) color = geneColors.tf_prog;
+    else if (geneGroups.tf_lin.includes(idx)) color = geneColors.tf_lin;
+    else if (geneGroups.ligand.includes(idx)) color = geneColors.ligand;
+    else if (geneGroups.receptor.includes(idx)) color = geneColors.receptor;
 
-    // Color by gene type
-    let color = '#8b949e';
-    if (geneGroups.tf_prog.includes(idx)) color = '#f85149';
-    else if (geneGroups.tf_lin.includes(idx)) color = '#58a6ff';
-    else if (geneGroups.ligand.includes(idx)) color = '#3fb950';
-    else if (geneGroups.receptor.includes(idx)) color = '#a371f7';
-
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fill();
+    points.push({
+      x: padding.left + (target / maxVal) * plotW,
+      y: padding.top + plotH * (1 - simulated / maxVal),
+      color,
+      weighted: isWeighted,
+      idx,
+    });
   }
 
-  // Labels
-  ctx.fillStyle = '#8b949e';
-  ctx.font = '11px sans-serif';
+  // Draw unweighted points first (faded)
+  points.filter(p => !p.weighted).forEach(p => {
+    ctx.globalAlpha = 0.25;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Draw weighted points on top (solid with border)
+  ctx.globalAlpha = 1;
+  points.filter(p => p.weighted).forEach(p => {
+    ctx.fillStyle = p.color;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // Compute and display R² for weighted genes
+  const weightedPoints = points.filter(p => p.weighted);
+  if (weightedPoints.length > 1) {
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+    const n = weightedPoints.length;
+
+    weightedPoints.forEach(p => {
+      const tx = targetExpression[p.idx] ?? 0;
+      const sy = bestSimulatedExpression![p.idx] ?? 0;
+      sumX += tx;
+      sumY += sy;
+      sumXY += tx * sy;
+      sumX2 += tx * tx;
+      sumY2 += sy * sy;
+    });
+
+    const num = n * sumXY - sumX * sumY;
+    const den = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+    const r = den > 0 ? num / den : 0;
+    const r2 = r * r;
+
+    // Display R²
+    ctx.fillStyle = '#39c5cf';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`R² = ${r2.toFixed(3)}`, w - padding.right - 5, padding.top + 15);
+  }
+}
+
+// Draw error chart - horizontal bars showing top mismatches
+function drawErrorChart(): void {
+  if (!errorCtx || !errorCanvas) return;
+
+  const ctx = errorCtx;
+  const dpr = window.devicePixelRatio || 1;
+  const w = errorCanvas.width / dpr;
+  const h = errorCanvas.height / dpr;
+
+  // Clear
+  ctx.fillStyle = '#161b22';
+  ctx.fillRect(0, 0, w, h);
+
+  const padding = { top: 10, right: 40, bottom: 20, left: 60 };
+  const plotW = w - padding.left - padding.right;
+  const plotH = h - padding.top - padding.bottom;
+
+  if (!bestSimulatedExpression) {
+    ctx.fillStyle = '#6e7681';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Waiting for results...', w / 2, h / 2);
+    return;
+  }
+
+  // Calculate errors for all displayed gene groups (show all if no weights selected)
+  const allGenes = [...geneGroups.tf_prog, ...geneGroups.tf_lin, ...geneGroups.ligand, ...geneGroups.receptor];
+  const errors: { idx: number; error: number; target: number; sim: number; name: string; weighted: boolean }[] = [];
+
+  // Check if any genes are weighted
+  const hasWeightedGenes = allGenes.some(idx => (targetWeights[idx] ?? 0) > 0);
+
+  for (const idx of allGenes) {
+    const weight = targetWeights[idx] ?? 0;
+    // If no weighted genes, show all; otherwise only show weighted
+    if (hasWeightedGenes && weight === 0) continue;
+
+    const target = targetExpression[idx] ?? 0;
+    const sim = bestSimulatedExpression[idx] ?? 0;
+    const error = sim - target;  // Positive = overshot, negative = undershot
+
+    let name = geneNames[idx] ?? `Gene${idx}`;
+    name = name.replace('TF_PROG_', 'P').replace('TF_LIN', 'L').replace('LIG_', 'Lig').replace('REC_', 'Rec');
+
+    errors.push({ idx, error, target, sim, name, weighted: weight > 0 });
+  }
+
+  // Sort by absolute error and take top N
+  errors.sort((a, b) => Math.abs(b.error) - Math.abs(a.error));
+  const topN = Math.min(8, errors.length);
+  const displayErrors = errors.slice(0, topN);
+
+  if (displayErrors.length === 0) {
+    ctx.fillStyle = '#6e7681';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('No genes to display', w / 2, h / 2);
+    return;
+  }
+
+  const totalHeight = displayErrors.length * 20;
+  const barHeight = Math.min(14, Math.max(10, (plotH - 5) / displayErrors.length - 2));
+  const barGap = Math.max(2, (plotH - displayErrors.length * barHeight) / (displayErrors.length + 1));
+  const maxError = Math.max(...displayErrors.map(e => Math.abs(e.error)), 0.5);
+
+  // Draw center line (zero error)
+  const centerX = padding.left + plotW / 2;
+  ctx.strokeStyle = '#30363d';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(centerX, padding.top);
+  ctx.lineTo(centerX, padding.top + plotH);
+  ctx.stroke();
+
+  // Draw error bars
+  displayErrors.forEach((e, i) => {
+    const y = padding.top + barGap + i * (barHeight + barGap);
+    const barW = Math.max(2, (Math.abs(e.error) / maxError) * (plotW / 2 - 5));
+
+    // Gene name label
+    ctx.fillStyle = e.weighted ? '#c9d1d9' : '#6e7681';
+    ctx.font = `${e.weighted ? 'bold ' : ''}9px sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.fillText(e.name, padding.left - 4, y + barHeight / 2 + 3);
+
+    // Error bar
+    const barColor = e.error > 0 ? '#ffa657' : '#58a6ff';
+    ctx.fillStyle = barColor;
+    if (e.error > 0) {
+      // Overshot (right side, orange)
+      ctx.fillRect(centerX + 1, y, barW, barHeight);
+    } else if (e.error < 0) {
+      // Undershot (left side, blue)
+      ctx.fillRect(centerX - barW - 1, y, barW, barHeight);
+    } else {
+      // Zero error - small mark at center
+      ctx.fillStyle = '#3fb950';
+      ctx.fillRect(centerX - 1, y, 2, barHeight);
+    }
+
+    // Error value on the outside
+    ctx.fillStyle = e.error === 0 ? '#3fb950' : barColor;
+    ctx.font = '8px sans-serif';
+    if (e.error >= 0) {
+      ctx.textAlign = 'left';
+      ctx.fillText((e.error >= 0 ? '+' : '') + e.error.toFixed(2), centerX + barW + 4, y + barHeight / 2 + 3);
+    } else {
+      ctx.textAlign = 'right';
+      ctx.fillText(e.error.toFixed(2), centerX - barW - 4, y + barHeight / 2 + 3);
+    }
+  });
+
+  // Labels at bottom
+  ctx.fillStyle = '#6e7681';
+  ctx.font = '9px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Target Expression', padding.left + plotW / 2, h - 5);
+  ctx.fillText('Under', padding.left + plotW * 0.22, h - 5);
+  ctx.fillText('Over', padding.left + plotW * 0.78, h - 5);
 
-  ctx.save();
-  ctx.translate(15, padding.top + plotH / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillText('Simulated Expression', 0, 0);
-  ctx.restore();
-
-  // Axis values
-  ctx.textAlign = 'center';
-  ctx.fillText('0', padding.left, h - padding.bottom + 15);
-  ctx.fillText('6', w - padding.right, h - padding.bottom + 15);
-
-  ctx.textAlign = 'right';
-  ctx.fillText('0', padding.left - 5, h - padding.bottom);
-  ctx.fillText('6', padding.left - 5, padding.top + 10);
+  // Arrows
+  ctx.fillText('←', padding.left + plotW * 0.08, h - 5);
+  ctx.fillText('→', padding.left + plotW * 0.92, h - 5);
 }
 
 // Update all charts
@@ -648,6 +943,7 @@ function updateCharts(): void {
   drawFitnessChart();
   drawComparisonChart();
   drawScatterChart();
+  drawErrorChart();
 }
 
 // Update results display - using safe DOM manipulation
@@ -779,6 +1075,7 @@ function startOptimization(): void {
   const includeKnockouts = (document.getElementById('opt-knockouts') as HTMLInputElement).checked;
   const includeMorphogens = (document.getElementById('opt-morphogens') as HTMLInputElement).checked;
   const includeModifiers = (document.getElementById('opt-modifiers') as HTMLInputElement).checked;
+  const requireHomogeneous = (document.getElementById('opt-homogeneous') as HTMLInputElement).checked;
   const maxGenerations = parseInt((document.getElementById('max-generations') as HTMLInputElement).value);
   const populationSize = parseInt((document.getElementById('pop-size') as HTMLInputElement).value);
   const simTime = parseInt((document.getElementById('sim-time') as HTMLInputElement).value);
@@ -838,6 +1135,7 @@ function startOptimization(): void {
       ensembleSize: 8,  // Sample cells at different spatial positions
       targetLineage,  // 0 = all positions, 1-6 = specific lineage
       uniformMorphogens,  // Apply morphogens to all cells equally
+      requireHomogeneous,  // Require ALL cells to match target
     },
     knockoutCandidates,
     modifierCandidates: knockoutCandidates,  // Same genes can have modifiers (TFs, ligands, receptors)
@@ -861,13 +1159,13 @@ function handleProgress(msg: WorkerProgressMessage): void {
   const maxGen = parseInt((document.getElementById('max-generations') as HTMLInputElement).value);
   const genDisplay = document.getElementById('gen-display');
   const fitnessDisplay = document.getElementById('fitness-display');
+  const worstDisplay = document.getElementById('worst-display');
   const corrDisplay = document.getElementById('corr-display');
-  const sigmaDisplay = document.getElementById('sigma-display');
 
   if (genDisplay) genDisplay.textContent = `${msg.generation} / ${maxGen}`;
   if (fitnessDisplay) fitnessDisplay.textContent = msg.bestFitness.toFixed(4);
+  if (worstDisplay) worstDisplay.textContent = msg.worstCellFitness.toFixed(4);
   if (corrDisplay) corrDisplay.textContent = msg.correlation.toFixed(3);
-  if (sigmaDisplay) sigmaDisplay.textContent = msg.sigma.toFixed(4);
 
   // Get encoding config
   const includeGlobal = (document.getElementById('opt-global') as HTMLInputElement).checked;

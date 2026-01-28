@@ -38,6 +38,7 @@ export interface WorkerStartMessage {
     ensembleSize: number;  // Number of cells per evaluation
     targetLineage: number;  // 0 = ensemble (all positions), 1-6 = specific lineage
     uniformMorphogens: boolean;  // Apply morphogens uniformly to all cells
+    requireHomogeneous: boolean;  // Require ALL cells to match target (use worst-case fitness)
   };
   knockoutCandidates: number[];  // Gene indices that can be knocked out
   modifierCandidates: number[];  // Gene indices that can have modifiers applied
@@ -62,6 +63,7 @@ export interface WorkerProgressMessage {
   generation: number;
   bestFitness: number;
   meanFitness: number;
+  worstCellFitness: number;  // Fitness of worst-performing cell (for homogeneity check)
   sigma: number;
   bestParams: number[];
   correlation: number;
@@ -95,6 +97,7 @@ let simMaxTime = 12;
 let ensembleSize = 5;
 let targetLineage = 0;  // 0 = ensemble (all positions), 1-6 = specific lineage
 let uniformMorphogens = true;  // Apply morphogens uniformly
+let requireHomogeneous = false;  // Require all cells to match (use worst-case fitness)
 let isPaused = false;
 let shouldStop = false;
 
@@ -104,12 +107,16 @@ let useVariancePenalty = false;
 /**
  * Evaluate fitness for a parameter vector
  *
- * Phase 1 (exploration): Simple average fitness - fast
- * Phase 2 (fine-tuning): Adds variance penalty to avoid bimodal distributions
+ * When requireHomogeneous is true:
+ *   Uses worst-case (max) fitness across cells, ensuring ALL cells must match target
  *
- * Returns { fitness: number for optimization, rawFitness: number for display }
+ * When requireHomogeneous is false:
+ *   Phase 1 (exploration): Simple average fitness - fast
+ *   Phase 2 (fine-tuning): Adds variance penalty to avoid bimodal distributions
+ *
+ * Returns { fitness: number for optimization, rawFitness: number for display, worstFitness: number }
  */
-function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; rawFitness: number } {
+function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; rawFitness: number; worstFitness: number } {
   if (!engine || !encodingConfig || !targetState) {
     throw new Error('Worker not initialized');
   }
@@ -127,22 +134,33 @@ function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; 
     results = engine.runEnsemble(params, ensembleSize, simMaxTime, uniformMorphogens);
   }
 
-  // Compute average fitness across results
-  let totalFitness = 0;
+  // Compute fitness for each cell
+  const cellFitnesses: number[] = [];
   for (const result of results) {
-    totalFitness += computeFitness(result, targetState);
+    cellFitnesses.push(computeFitness(result, targetState));
   }
-  const meanFitness = totalFitness / results.length;
 
-  // Phase 1: Just return average fitness (fast exploration)
+  const meanFitness = cellFitnesses.reduce((a, b) => a + b, 0) / cellFitnesses.length;
+  const worstFitness = Math.max(...cellFitnesses);  // Higher = worse
+
+  // When homogeneous mode is enabled, optimize for worst cell
+  // This ensures ALL cells must match the target
+  if (requireHomogeneous) {
+    // Use a blend of worst-case and mean to help optimization converge
+    // 70% worst + 30% mean gives gradient signal while prioritizing worst cell
+    const blendedFitness = 0.7 * worstFitness + 0.3 * meanFitness;
+    return { fitness: blendedFitness, rawFitness: meanFitness, worstFitness };
+  }
+
+  // Standard mode: Phase 1 = mean fitness, Phase 2 = mean + variance penalty
   if (!useVariancePenalty) {
-    return { fitness: meanFitness, rawFitness: meanFitness };
+    return { fitness: meanFitness, rawFitness: meanFitness, worstFitness };
   }
 
   // Phase 2: Add variance penalty to discourage bimodality
   const nGenes = targetState.expression.length;
   let variancePenalty = 0;
-  const varianceWeight = 0.3;
+  const varianceWeight = 0.5;  // Increased from 0.3
 
   for (let g = 0; g < nGenes; g++) {
     const weight = targetState.weights[g] ?? 0;
@@ -168,7 +186,8 @@ function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; 
   // Return both: penalized for optimization, raw for display
   return {
     fitness: meanFitness + varianceWeight * variancePenalty,
-    rawFitness: meanFitness
+    rawFitness: meanFitness,
+    worstFitness
   };
 }
 
@@ -266,7 +285,7 @@ async function runOptimization(): Promise<void> {
     const correlation = computeCorrelation(best.params);
 
     // Get raw fitness (without variance penalty) for display
-    const { rawFitness } = evaluateFitnessDetailed(best.params);
+    const { rawFitness, worstFitness } = evaluateFitnessDetailed(best.params);
 
     // Send progress update (report raw fitness for comparability)
     const progressMsg: WorkerProgressMessage = {
@@ -274,6 +293,7 @@ async function runOptimization(): Promise<void> {
       generation: gen,
       bestFitness: rawFitness,  // Report raw fitness for display
       meanFitness,
+      worstCellFitness: worstFitness,  // Report worst cell fitness for homogeneity monitoring
       sigma: optimizer.getSigma(),
       bestParams: Array.from(best.params),
       correlation,
@@ -345,6 +365,7 @@ self.onmessage = async (event: MessageEvent<WorkerInMessage>) => {
         ensembleSize = msg.config.ensembleSize;
         targetLineage = msg.config.targetLineage;
         uniformMorphogens = msg.config.uniformMorphogens;
+        requireHomogeneous = msg.config.requireHomogeneous;
 
         // Initialize optimizer
         const dims = getDimensions(encodingConfig);

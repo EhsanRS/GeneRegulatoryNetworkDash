@@ -176,6 +176,14 @@
           </div>
 
           <div class="config-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-homogeneous">
+              <span>Require homogeneous population</span>
+            </label>
+            <p class="config-hint">ALL cells must match target (optimizes worst cell, slower but ensures uniformity)</p>
+          </div>
+
+          <div class="config-group">
             <label>Max Generations: <span id="max-gen-val">200</span></label>
             <input type="range" id="max-generations" min="50" max="500" step="10" value="200">
           </div>
@@ -226,16 +234,16 @@
                   <span class="stat-value" id="gen-display">0 / 200</span>
                 </div>
                 <div class="stat">
-                  <span class="stat-label">Best Fitness</span>
+                  <span class="stat-label">Avg Fitness</span>
                   <span class="stat-value" id="fitness-display">-</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Worst Cell</span>
+                  <span class="stat-value" id="worst-display">-</span>
                 </div>
                 <div class="stat">
                   <span class="stat-label">Correlation</span>
                   <span class="stat-value" id="corr-display">-</span>
-                </div>
-                <div class="stat">
-                  <span class="stat-label">Step Size (σ)</span>
-                  <span class="stat-value" id="sigma-display">-</span>
                 </div>
               </div>
               <div class="chart-container">
@@ -245,28 +253,44 @@
           </div>
         </div>
 
-        <div class="viz-row">
-          <div class="viz-panel comparison-panel">
+        <div class="viz-row viz-row-split">
+          <div class="viz-panel scatter-panel">
             <div class="viz-header">
-              <h3>Expression Comparison</h3>
-              <div class="legend-inline">
-                <span class="legend-item target">● Target</span>
-                <span class="legend-item simulated">○ Best Found</span>
+              <h3>Target vs Simulated</h3>
+              <div class="legend-inline scatter-legend">
+                <span class="legend-dot prog"></span><span>Prog TF</span>
+                <span class="legend-dot lin"></span><span>Lin TF</span>
+                <span class="legend-dot ligand"></span><span>Ligand</span>
+                <span class="legend-dot receptor"></span><span>Receptor</span>
               </div>
             </div>
             <div class="viz-content">
-              <canvas id="comparison-chart"></canvas>
+              <canvas id="scatter-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="viz-panel error-panel">
+            <div class="viz-header">
+              <h3>Top Errors</h3>
+              <span class="error-hint">Genes with largest mismatch</span>
+            </div>
+            <div class="viz-content">
+              <canvas id="error-chart"></canvas>
             </div>
           </div>
         </div>
 
         <div class="viz-row">
-          <div class="viz-panel scatter-panel">
+          <div class="viz-panel comparison-panel">
             <div class="viz-header">
-              <h3>Target vs Simulated</h3>
+              <h3>Expression by Gene Group</h3>
+              <div class="legend-inline">
+                <span class="legend-bar target"></span><span>Target</span>
+                <span class="legend-bar simulated"></span><span>Simulated</span>
+              </div>
             </div>
             <div class="viz-content">
-              <canvas id="scatter-chart"></canvas>
+              <canvas id="comparison-chart"></canvas>
             </div>
           </div>
         </div>
