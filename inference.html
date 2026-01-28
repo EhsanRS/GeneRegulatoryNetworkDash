@@ -28,6 +28,26 @@
           <h2>Target State Setup</h2>
           <p class="section-hint">Define the desired gene expression levels</p>
 
+          <div class="target-mode-tabs">
+            <button class="target-mode-tab active" data-mode="final">Final State</button>
+            <button class="target-mode-tab" data-mode="timecourse">Time Course</button>
+          </div>
+
+          <div id="final-state-panel" class="target-mode-panel">
+            <div class="state-preset-row">
+            <span class="preset-row-label">Quick Presets:</span>
+            <div class="state-preset-grid">
+              <button class="state-preset-btn active" data-preset="progenitor" title="High progenitor TFs, low lineage TFs">Progenitor</button>
+              <button class="state-preset-btn" data-preset="multipotent" title="Poised for multiple fates">Multipotent</button>
+              <button class="state-preset-btn lineage-1" data-preset="l1" title="Lineage 1 committed">L1</button>
+              <button class="state-preset-btn lineage-2" data-preset="l2" title="Lineage 2 committed">L2</button>
+              <button class="state-preset-btn lineage-3" data-preset="l3" title="Lineage 3 committed">L3</button>
+              <button class="state-preset-btn lineage-4" data-preset="l4" title="Lineage 4 committed">L4</button>
+              <button class="state-preset-btn lineage-5" data-preset="l5" title="Lineage 5 committed">L5</button>
+              <button class="state-preset-btn lineage-6" data-preset="l6" title="Lineage 6 committed">L6</button>
+            </div>
+          </div>
+
           <div class="target-section">
             <div class="section-title accordion-header" data-target="prog-targets">
               <span class="accordion-icon">▼</span> Progenitor TFs
@@ -54,6 +74,17 @@
               <span class="accordion-icon">▶</span> Receptors
             </div>
             <div id="receptor-targets" class="target-list accordion-content collapsed"></div>
+          </div>
+          </div><!-- End final-state-panel -->
+
+          <div id="timecourse-panel" class="target-mode-panel hidden">
+            <p class="timecourse-hint">Define target expression at multiple time points</p>
+
+            <div id="timepoint-list" class="timepoint-list">
+              <!-- Timepoints will be added dynamically -->
+            </div>
+
+            <button id="btn-add-timepoint" class="add-timepoint-btn">+ Add Timepoint</button>
           </div>
         </section>
 
@@ -175,6 +206,20 @@
             <p class="config-hint">Optimize continuous modifiers (0=inhibited, 1=normal, 2=overexpressed)</p>
           </div>
 
+          <div class="config-group modifier-sub-option" id="minimal-intervention-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-minimal-intervention">
+              <span>Minimize interventions</span>
+            </label>
+            <p class="config-hint">Find smallest set of modifiers needed (L1 regularization)</p>
+          </div>
+
+          <div class="config-group modifier-sub-option" id="intervention-penalty-group">
+            <label>Sparsity Penalty: <span id="intervention-penalty-val">0.10</span></label>
+            <input type="range" id="intervention-penalty" min="0.01" max="0.5" step="0.01" value="0.1">
+            <p class="config-hint">Higher = fewer interventions (but may sacrifice fitness)</p>
+          </div>
+
           <div class="config-group">
             <label class="checkbox-label">
               <input type="checkbox" id="opt-homogeneous">
@@ -244,6 +289,10 @@
                 <div class="stat">
                   <span class="stat-label">Correlation</span>
                   <span class="stat-value" id="corr-display">-</span>
+                </div>
+                <div class="stat" id="intervention-stat" style="display: none;">
+                  <span class="stat-label">Interventions</span>
+                  <span class="stat-value" id="intervention-display">-</span>
                 </div>
               </div>
               <div class="chart-container">
@@ -327,6 +376,32 @@
           </div>
         </section>
 
+        <section class="panel" id="sensitivity-panel">
+          <h2>Sensitivity Analysis</h2>
+          <p class="section-hint">Identify which parameters have biggest impact</p>
+          <div id="sensitivity-content" class="sensitivity-content">
+            <p class="placeholder">Run optimization first</p>
+          </div>
+          <div class="sensitivity-chart-container">
+            <canvas id="sensitivity-chart"></canvas>
+          </div>
+          <button id="btn-sensitivity" class="secondary" disabled>Run Analysis</button>
+        </section>
+
+        <section class="panel" id="stability-panel">
+          <h2>Stability Check</h2>
+          <p class="section-hint">Verify if the found state is a stable attractor</p>
+          <div id="stability-content" class="stability-content">
+            <p class="placeholder">Run optimization first</p>
+          </div>
+          <div id="stability-drifting-genes" class="stability-drifting-genes"></div>
+          <div class="stability-controls">
+            <label>Threshold: <span id="stability-threshold-val">0.10</span></label>
+            <input type="range" id="stability-threshold" min="0.05" max="0.5" step="0.01" value="0.1">
+          </div>
+          <button id="btn-stability" class="secondary" disabled>Check Stability</button>
+        </section>
+
         <section class="panel actions-panel">
           <h2>Actions</h2>
           <div class="action-buttons">
@@ -335,6 +410,63 @@
           </div>
         </section>
       </aside>
+    </div>
+  </div>
+
+  <!-- Timepoint Edit Modal -->
+  <div id="timepoint-modal" class="modal hidden">
+    <div class="modal-content timepoint-modal-content">
+      <div class="modal-header">
+        <h3>Edit Timepoint: <span id="timepoint-modal-title">t = 0h</span></h3>
+        <button class="modal-close" id="timepoint-modal-close">×</button>
+      </div>
+      <div class="modal-body timepoint-modal-body">
+        <div class="timepoint-preset-row">
+          <span class="preset-row-label">Quick Presets:</span>
+          <div class="state-preset-grid" id="timepoint-preset-grid">
+            <button class="state-preset-btn" data-preset="progenitor" title="High progenitor TFs, low lineage TFs">Progenitor</button>
+            <button class="state-preset-btn" data-preset="multipotent" title="Poised for multiple fates">Multipotent</button>
+            <button class="state-preset-btn lineage-1" data-preset="l1" title="Lineage 1 committed">L1</button>
+            <button class="state-preset-btn lineage-2" data-preset="l2" title="Lineage 2 committed">L2</button>
+            <button class="state-preset-btn lineage-3" data-preset="l3" title="Lineage 3 committed">L3</button>
+            <button class="state-preset-btn lineage-4" data-preset="l4" title="Lineage 4 committed">L4</button>
+            <button class="state-preset-btn lineage-5" data-preset="l5" title="Lineage 5 committed">L5</button>
+            <button class="state-preset-btn lineage-6" data-preset="l6" title="Lineage 6 committed">L6</button>
+          </div>
+        </div>
+
+        <div class="target-section">
+          <div class="section-title accordion-header" data-target="tp-prog-targets">
+            <span class="accordion-icon">▼</span> Progenitor TFs
+          </div>
+          <div id="tp-prog-targets" class="target-list accordion-content"></div>
+        </div>
+
+        <div class="target-section">
+          <div class="section-title accordion-header" data-target="tp-lin-targets">
+            <span class="accordion-icon">▼</span> Lineage TFs
+          </div>
+          <div id="tp-lin-targets" class="target-list accordion-content"></div>
+        </div>
+
+        <div class="target-section">
+          <div class="section-title accordion-header" data-target="tp-ligand-targets">
+            <span class="accordion-icon">▶</span> Ligands
+          </div>
+          <div id="tp-ligand-targets" class="target-list accordion-content collapsed"></div>
+        </div>
+
+        <div class="target-section">
+          <div class="section-title accordion-header" data-target="tp-receptor-targets">
+            <span class="accordion-icon">▶</span> Receptors
+          </div>
+          <div id="tp-receptor-targets" class="target-list accordion-content collapsed"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-timepoint-save" class="primary">Save</button>
+        <button id="btn-timepoint-cancel">Cancel</button>
+      </div>
     </div>
   </div>
 

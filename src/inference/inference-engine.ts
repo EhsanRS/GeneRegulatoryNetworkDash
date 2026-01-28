@@ -357,4 +357,253 @@ export class InferenceEngine {
 
     return this.runSimulation(params, idealAngle, maxTime, uniformMorphogens);
   }
+
+  /**
+   * Run simulation and capture expression snapshots at specified timepoints
+   * Used for time-course target matching
+   */
+  runSimulationWithSnapshots(
+    params: SimulationParams,
+    spatialAngle: number = Math.PI,
+    timepoints: number[],
+    uniformMorphogens: boolean = false,
+    dt: number = 0.1,
+    noiseLevel: number = 0.01
+  ): Map<number, Float32Array> {
+    const { global: g, knockouts, morphogens, geneModifiers } = params;
+
+    // Build weight matrix with current inhibition multiplier
+    const W = new Float32Array(this.nGenes * this.nGenes);
+    this.baseEdgeInfo.forEach(({ srcIdx, tgtIdx, weight }) => {
+      const w = weight < 0 ? weight * g.inhibitionMult : weight;
+      W[tgtIdx * this.nGenes + srcIdx] = w;
+    });
+
+    // Build bias and decay arrays
+    const bias = new Float32Array(this.nGenes);
+    const decay = new Float32Array(this.nGenes);
+
+    this.groups.tf_prog.forEach(i => { bias[i] = g.progBias; decay[i] = g.progDecay; });
+    this.groups.tf_lin.forEach(i => { bias[i] = g.linBias; decay[i] = g.linDecay; });
+    this.groups.ligand.forEach(i => { bias[i] = g.ligandBias; decay[i] = 0.2; });
+    this.groups.receptor.forEach(i => { bias[i] = g.receptorBias; decay[i] = 0.1; });
+    this.groups.target.forEach(i => { bias[i] = 0.02; decay[i] = 0.25; });
+    this.groups.housekeeping.forEach(i => { bias[i] = 0.5; decay[i] = 0.1; });
+    this.groups.other.forEach(i => { bias[i] = 0.05; decay[i] = 0.2; });
+
+    // Initialize expression
+    const expression = new Float32Array(this.nGenes);
+    this.groups.tf_prog.forEach(i => { expression[i] = g.initProgTF + Math.random() * 0.2; });
+    this.groups.tf_lin.forEach(i => { expression[i] = g.initLinTF + Math.random() * 0.1; });
+    this.groups.ligand.forEach(i => { expression[i] = 0.2 + Math.random() * 0.1; });
+    this.groups.receptor.forEach(i => { expression[i] = 0.2 + Math.random() * 0.1; });
+    this.groups.target.forEach(i => { expression[i] = 0.1 + Math.random() * 0.05; });
+    this.groups.housekeeping.forEach(i => { expression[i] = 1.0 + Math.random() * 0.2; });
+    this.groups.other.forEach(i => { expression[i] = 0.1 + Math.random() * 0.05; });
+
+    // Apply knockouts
+    knockouts.forEach(i => { expression[i] = 0; });
+
+    // Lineage sector configuration
+    const lineageSectorSizes = [1.5, 0.8, 1.2, 0.6, 1.0, 0.9];
+    const totalSize = lineageSectorSizes.reduce((a, b) => a + b, 0);
+    const lineageSectorStarts: number[] = [];
+    let cumAngle = 0;
+    lineageSectorSizes.forEach((size) => {
+      lineageSectorStarts.push(cumAngle);
+      cumAngle += (size / totalSize) * 2 * Math.PI;
+    });
+
+    const nLineages = 6;
+    const tfsPerLineage = 2;
+
+    // Sort timepoints and prepare snapshot collection
+    const sortedTimepoints = [...timepoints].sort((a, b) => a - b);
+    const maxTime = sortedTimepoints[sortedTimepoints.length - 1] ?? 12;
+    const snapshots = new Map<number, Float32Array>();
+    let nextSnapshotIdx = 0;
+
+    // Simulation loop
+    const h = new Float32Array(this.nGenes);
+    const f = new Float32Array(this.nGenes);
+
+    for (let time = 0; time <= maxTime + dt; time += dt) {
+      // Capture snapshots at specified timepoints
+      while (nextSnapshotIdx < sortedTimepoints.length &&
+             time >= sortedTimepoints[nextSnapshotIdx] - dt/2) {
+        snapshots.set(sortedTimepoints[nextSnapshotIdx], new Float32Array(expression));
+        nextSnapshotIdx++;
+      }
+
+      if (time >= maxTime) break;
+
+      // Compute morphogen signal
+      const morphogen = new Float32Array(this.nGenes);
+
+      for (let lin = 0; lin < nLineages; lin++) {
+        const m = morphogens[lin];
+        if (!m || !m.enabled) continue;
+
+        const receptorIdx = this.groups.receptor[lin % this.groups.receptor.length];
+        if (receptorIdx !== undefined && knockouts.has(receptorIdx)) continue;
+
+        const receptorExpr = receptorIdx !== undefined ? (expression[receptorIdx] ?? 0) : 1;
+        if (receptorExpr < 0.1) continue;
+
+        const tfIndices = this.groups.tf_lin.slice(lin * tfsPerLineage, (lin + 1) * tfsPerLineage);
+
+        const sectorStart = lineageSectorStarts[lin] ?? 0;
+        const sectorSize = (lineageSectorSizes[lin] ?? 1) / totalSize * 2 * Math.PI;
+        const sectorCenter = sectorStart + sectorSize / 2;
+
+        let spatialStrength = 1.0;
+        if (!uniformMorphogens) {
+          let angleDiff = Math.abs(spatialAngle - sectorCenter);
+          if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+          const width = sectorSize / 2;
+          spatialStrength = Math.exp(-(angleDiff * angleDiff) / (width * width * 0.5));
+        }
+        const timeStrength = Math.min(1, time / g.morphogenTime);
+        const receptorGain = Math.min(1, receptorExpr / 0.5);
+        const strength = spatialStrength * timeStrength * g.morphogenStrength * receptorGain * m.strength;
+
+        tfIndices.forEach(i => {
+          morphogen[i] = strength;
+        });
+      }
+
+      // Compute Hill function
+      for (let i = 0; i < this.nGenes; i++) {
+        const x = expression[i] ?? 0;
+        const xPos = Math.max(x, 0);
+        const xPow = Math.pow(xPos, g.hillN);
+        const kPow = Math.pow(g.hillK, g.hillN);
+        h[i] = xPow / (kPow + xPow + 1e-8);
+      }
+
+      // Compute regulatory input
+      for (let i = 0; i < this.nGenes; i++) {
+        let input = bias[i] ?? 0;
+        for (let j = 0; j < this.nGenes; j++) {
+          input += (h[j] ?? 0) * (W[i * this.nGenes + j] ?? 0);
+        }
+        input += morphogen[i] ?? 0;
+
+        const modifier = geneModifiers?.get(i) ?? 1.0;
+        input *= modifier;
+
+        f[i] = input - (decay[i] ?? 0) * (expression[i] ?? 0);
+      }
+
+      // Update expression
+      for (let i = 0; i < this.nGenes; i++) {
+        if (knockouts.has(i)) {
+          expression[i] = 0;
+          continue;
+        }
+        const noise = (Math.random() - 0.5) * 2 * noiseLevel * Math.sqrt(dt);
+        expression[i] = Math.max(0, Math.min(6, expression[i] + dt * f[i] + noise));
+      }
+    }
+
+    return snapshots;
+  }
+
+  /**
+   * Stability analysis result
+   */
+  checkStability(
+    params: SimulationParams,
+    initialTime: number = 12,
+    extendedTime: number = 18,
+    threshold: number = 0.1,
+    uniformMorphogens: boolean = true
+  ): StabilityResult {
+    // Run simulation to initial time
+    const initialState = this.runSimulation(params, Math.PI, initialTime, uniformMorphogens, 0.1, 0);
+
+    // Run simulation to extended time
+    const extendedState = this.runSimulation(params, Math.PI, extendedTime, uniformMorphogens, 0.1, 0);
+
+    // Compute drift for each gene
+    const driftPerGene = new Map<number, number>();
+    let driftSum = 0;
+    const significantThreshold = 0.05;
+
+    for (let i = 0; i < this.nGenes; i++) {
+      const initialVal = initialState.expression[i] ?? 0;
+      const extendedVal = extendedState.expression[i] ?? 0;
+      const drift = extendedVal - initialVal;
+
+      driftSum += drift * drift;
+
+      if (Math.abs(drift) > significantThreshold) {
+        driftPerGene.set(i, drift);
+      }
+    }
+
+    const driftMagnitude = Math.sqrt(driftSum / this.nGenes);
+
+    // Find equilibrium time by running extended simulation with checkpoints
+    const equilibriumTime = this.findEquilibriumTime(params, initialTime, uniformMorphogens, threshold);
+
+    // Compute confidence based on drift
+    const confidence = Math.max(0, Math.min(1, 1.0 - driftMagnitude / threshold));
+
+    return {
+      isStable: driftMagnitude < threshold,
+      driftMagnitude,
+      driftPerGene,
+      timeToEquilibrium: equilibriumTime,
+      confidence,
+    };
+  }
+
+  /**
+   * Find time when expression reaches equilibrium
+   */
+  private findEquilibriumTime(
+    params: SimulationParams,
+    startTime: number,
+    uniformMorphogens: boolean,
+    threshold: number
+  ): number {
+    const checkInterval = 2;  // Check every 2 hours
+    const maxExtension = 12;  // Max 12 additional hours
+
+    let lastExpression: Float32Array | null = null;
+
+    for (let t = startTime; t <= startTime + maxExtension; t += checkInterval) {
+      const state = this.runSimulation(params, Math.PI, t, uniformMorphogens, 0.1, 0);
+
+      if (lastExpression !== null) {
+        // Compute change from last checkpoint
+        let changeSum = 0;
+        for (let i = 0; i < this.nGenes; i++) {
+          const diff = (state.expression[i] ?? 0) - (lastExpression[i] ?? 0);
+          changeSum += diff * diff;
+        }
+        const changeMagnitude = Math.sqrt(changeSum / this.nGenes);
+
+        if (changeMagnitude < threshold * 0.5) {
+          return t;
+        }
+      }
+
+      lastExpression = new Float32Array(state.expression);
+    }
+
+    return startTime + maxExtension;  // Did not reach equilibrium
+  }
+}
+
+/**
+ * Result from stability check
+ */
+export interface StabilityResult {
+  isStable: boolean;
+  driftMagnitude: number;
+  driftPerGene: Map<number, number>;
+  timeToEquilibrium: number;
+  confidence: number;
 }

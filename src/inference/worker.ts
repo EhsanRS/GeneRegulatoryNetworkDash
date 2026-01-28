@@ -19,6 +19,12 @@ import {
 import { computeFitness, type TargetState } from './objective';
 
 // Message types
+export interface TimePointTarget {
+  time: number;           // Hours (e.g., 2, 6, 12)
+  expression: number[];   // Target expression at this time
+  weight: number;         // Importance of this timepoint (0-1)
+}
+
 export interface WorkerStartMessage {
   type: 'start';
   grnData: GRNData;
@@ -26,11 +32,14 @@ export interface WorkerStartMessage {
     expression: number[];
     weights: number[];
   };
+  timeCourseTarget?: TimePointTarget[];  // Optional time-course targets
   config: {
     includeGlobal: boolean;
     includeKnockouts: boolean;
     includeMorphogens: boolean;
     includeModifiers: boolean;  // Include gene modifiers (overexpression/inhibition)
+    minimalIntervention: boolean;  // Enable L1 regularization to minimize number of modifiers
+    interventionPenalty: number;  // Lambda for L1 penalty (0.01 to 0.5)
     maxGenerations: number;
     populationSize: number;
     sigma: number;
@@ -39,6 +48,7 @@ export interface WorkerStartMessage {
     targetLineage: number;  // 0 = ensemble (all positions), 1-6 = specific lineage
     uniformMorphogens: boolean;  // Apply morphogens uniformly to all cells
     requireHomogeneous: boolean;  // Require ALL cells to match target (use worst-case fitness)
+    timeCourseMode: boolean;  // Enable time-course target matching
   };
   knockoutCandidates: number[];  // Gene indices that can be knocked out
   modifierCandidates: number[];  // Gene indices that can have modifiers applied
@@ -67,6 +77,7 @@ export interface WorkerProgressMessage {
   sigma: number;
   bestParams: number[];
   correlation: number;
+  interventionCount: number;  // Number of modifiers that deviate from 1.0
 }
 
 export interface WorkerDoneMessage {
@@ -98,6 +109,10 @@ let ensembleSize = 5;
 let targetLineage = 0;  // 0 = ensemble (all positions), 1-6 = specific lineage
 let uniformMorphogens = true;  // Apply morphogens uniformly
 let requireHomogeneous = false;  // Require all cells to match (use worst-case fitness)
+let minimalIntervention = false;  // Enable L1 regularization for modifiers
+let interventionPenalty = 0.1;  // Lambda for L1 penalty
+let timeCourseMode = false;  // Enable time-course target matching
+let timeCourseTargets: TimePointTarget[] = [];  // Time-course targets
 let isPaused = false;
 let shouldStop = false;
 
@@ -105,7 +120,70 @@ let shouldStop = false;
 let useVariancePenalty = false;
 
 /**
+ * Count interventions (modifiers that deviate from 1.0)
+ */
+function countInterventions(params: SimulationParams): number {
+  let count = 0;
+  const threshold = 0.1;  // Deviation threshold to count as intervention
+  params.geneModifiers.forEach((modifier) => {
+    if (Math.abs(modifier - 1.0) > threshold) {
+      count++;
+    }
+  });
+  return count;
+}
+
+/**
+ * Compute L1 penalty for gene modifiers
+ * Penalizes deviation from 1.0 (normal expression)
+ */
+function computeL1Penalty(params: SimulationParams): number {
+  let l1Sum = 0;
+  params.geneModifiers.forEach((modifier) => {
+    l1Sum += Math.abs(modifier - 1.0);
+  });
+  return l1Sum;
+}
+
+/**
+ * Evaluate time-course fitness for a parameter vector
+ * Computes fitness at multiple timepoints and aggregates with weights
+ */
+function evaluateTimeCourse(params: SimulationParams, paramVector: Float64Array): { fitness: number; rawFitness: number } {
+  if (!engine || !targetState) {
+    throw new Error('Worker not initialized');
+  }
+
+  const timepoints = timeCourseTargets.map(t => t.time);
+  const snapshots = engine.runSimulationWithSnapshots(params, Math.PI, timepoints, uniformMorphogens);
+
+  let totalFitness = 0;
+  let totalWeight = 0;
+
+  for (const target of timeCourseTargets) {
+    const expression = snapshots.get(target.time);
+    if (!expression) continue;
+
+    // Compute fitness for this timepoint
+    const timepointTarget: TargetState = {
+      expression: new Float32Array(target.expression),
+      weights: targetState.weights,
+    };
+    const fitness = computeFitness({ expression, lineage: 0 }, timepointTarget);
+
+    totalFitness += fitness * target.weight;
+    totalWeight += target.weight;
+  }
+
+  const meanFitness = totalWeight > 0 ? totalFitness / totalWeight : 0;
+  return { fitness: meanFitness, rawFitness: meanFitness };
+}
+
+/**
  * Evaluate fitness for a parameter vector
+ *
+ * When timeCourseMode is true:
+ *   Evaluates fitness at multiple timepoints
  *
  * When requireHomogeneous is true:
  *   Uses worst-case (max) fitness across cells, ensuring ALL cells must match target
@@ -114,15 +192,37 @@ let useVariancePenalty = false;
  *   Phase 1 (exploration): Simple average fitness - fast
  *   Phase 2 (fine-tuning): Adds variance penalty to avoid bimodal distributions
  *
- * Returns { fitness: number for optimization, rawFitness: number for display, worstFitness: number }
+ * When minimalIntervention is true:
+ *   Adds L1 penalty to discourage many modifier interventions
+ *
+ * Returns { fitness: number for optimization, rawFitness: number for display, worstFitness: number, interventionCount: number }
  */
-function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; rawFitness: number; worstFitness: number } {
+function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; rawFitness: number; worstFitness: number; interventionCount: number } {
   if (!engine || !encodingConfig || !targetState) {
     throw new Error('Worker not initialized');
   }
 
   const params = decode(paramVector, encodingConfig);
+  const interventionCount = countInterventions(params);
 
+  // Compute L1 penalty if minimal intervention mode is enabled
+  let l1Penalty = 0;
+  if (minimalIntervention && encodingConfig.includeModifiers) {
+    l1Penalty = interventionPenalty * computeL1Penalty(params);
+  }
+
+  // Time-course mode: evaluate at multiple timepoints
+  if (timeCourseMode && timeCourseTargets.length > 0) {
+    const { fitness, rawFitness } = evaluateTimeCourse(params, paramVector);
+    return {
+      fitness: fitness + l1Penalty,
+      rawFitness,
+      worstFitness: rawFitness,  // Use same value for time-course
+      interventionCount
+    };
+  }
+
+  // Standard mode: single timepoint evaluation
   // Run simulation - either for specific lineage or ensemble
   let results: { expression: Float32Array; lineage: number }[];
   if (targetLineage > 0) {
@@ -148,13 +248,13 @@ function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; 
   if (requireHomogeneous) {
     // Use a blend of worst-case and mean to help optimization converge
     // 70% worst + 30% mean gives gradient signal while prioritizing worst cell
-    const blendedFitness = 0.7 * worstFitness + 0.3 * meanFitness;
-    return { fitness: blendedFitness, rawFitness: meanFitness, worstFitness };
+    const blendedFitness = 0.7 * worstFitness + 0.3 * meanFitness + l1Penalty;
+    return { fitness: blendedFitness, rawFitness: meanFitness, worstFitness, interventionCount };
   }
 
   // Standard mode: Phase 1 = mean fitness, Phase 2 = mean + variance penalty
   if (!useVariancePenalty) {
-    return { fitness: meanFitness, rawFitness: meanFitness, worstFitness };
+    return { fitness: meanFitness + l1Penalty, rawFitness: meanFitness, worstFitness, interventionCount };
   }
 
   // Phase 2: Add variance penalty to discourage bimodality
@@ -185,9 +285,10 @@ function evaluateFitnessDetailed(paramVector: Float64Array): { fitness: number; 
 
   // Return both: penalized for optimization, raw for display
   return {
-    fitness: meanFitness + varianceWeight * variancePenalty,
+    fitness: meanFitness + varianceWeight * variancePenalty + l1Penalty,
     rawFitness: meanFitness,
-    worstFitness
+    worstFitness,
+    interventionCount
   };
 }
 
@@ -285,7 +386,7 @@ async function runOptimization(): Promise<void> {
     const correlation = computeCorrelation(best.params);
 
     // Get raw fitness (without variance penalty) for display
-    const { rawFitness, worstFitness } = evaluateFitnessDetailed(best.params);
+    const { rawFitness, worstFitness, interventionCount } = evaluateFitnessDetailed(best.params);
 
     // Send progress update (report raw fitness for comparability)
     const progressMsg: WorkerProgressMessage = {
@@ -297,6 +398,7 @@ async function runOptimization(): Promise<void> {
       sigma: optimizer.getSigma(),
       bestParams: Array.from(best.params),
       correlation,
+      interventionCount,  // Report number of active interventions
     };
     self.postMessage(progressMsg);
 
@@ -366,6 +468,10 @@ self.onmessage = async (event: MessageEvent<WorkerInMessage>) => {
         targetLineage = msg.config.targetLineage;
         uniformMorphogens = msg.config.uniformMorphogens;
         requireHomogeneous = msg.config.requireHomogeneous;
+        minimalIntervention = msg.config.minimalIntervention ?? false;
+        interventionPenalty = msg.config.interventionPenalty ?? 0.1;
+        timeCourseMode = msg.config.timeCourseMode ?? false;
+        timeCourseTargets = msg.timeCourseTarget ?? [];
 
         // Initialize optimizer
         const dims = getDimensions(encodingConfig);
